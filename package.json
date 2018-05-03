@@ -1,0 +1,19 @@
+{
+  "name": "xls-report",
+  "version": "1.0.0",
+  "description": "Module of excel-report generation by template for remote expert",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://arlio@bitbucket.org/arlio/xls-report.git"
+  },
+  "author": "Arlio Bizarre",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/arlio/xls-report#readme",
+  "dependencies": {
+    "xlsx-populate": "^1.14.1"
+  }
+}
