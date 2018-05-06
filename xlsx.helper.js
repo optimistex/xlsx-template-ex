@@ -6,7 +6,13 @@ const xlsx = require('xlsx-populate');
  * @param data - a source data
  * @returns {Promise<Buffer>}
  */
-exports.xlsxBuildByTemplate = (data, templateFileName = './xlsx.helper.template.xlsx') => {
+exports.xlsxBuildByTemplate = (data, templateFileName = null) => {
+    if (!templateFileName) {
+        templateFileName = __dirname + '/xlsx.helper.template.xlsx';
+    }
+    if (!data) {
+        return Promise.reject('Undefined data');
+    }
     return xlsx.fromFileAsync(templateFileName).then(function (wb) {
         for (let name in data) {
             if (data.hasOwnProperty(name)) {
