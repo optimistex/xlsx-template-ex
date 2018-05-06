@@ -6,7 +6,7 @@ const xlsx = require('xlsx-populate');
  * @param data - a source data
  * @returns {Promise<Buffer>}
  */
-exports.xlsxBuildByTemplate = (templateFileName, data) => {
+exports.xlsxBuildByTemplate = (data, templateFileName = './xlsx.helper.template.xlsx') => {
     return xlsx.fromFileAsync(templateFileName).then(function (wb) {
         for (let name in data) {
             if (data.hasOwnProperty(name)) {

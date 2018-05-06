@@ -39,7 +39,7 @@ const testData = {
     ]
 };
 
-xlsxHelper.xlsxBuildByTemplate('test.xlsx', testData).then((buffer) => {
+xlsxHelper.xlsxBuildByTemplate(testData, 'xlsx.helper.template.xlsx').then((buffer) => {
     fs.writeFileSync('./out.xlsx', buffer);
 });
 
