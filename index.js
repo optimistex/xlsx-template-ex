@@ -1,6 +1,9 @@
 const fs = require('fs');
 const xlsxHelper = require('./xlsx.helper');
-const testData = {
+
+const xlsxTemplate = require('./xlsx-template');
+
+const testDataOld = {
     'name': 'Отчёт',
     'date': '01.05.2018',
     'users': [
@@ -39,36 +42,69 @@ const testData = {
     ]
 };
 
-xlsxHelper.xlsxBuildByTemplate(testData, 'xlsx.helper.template.xlsx').then((buffer) => {
-    fs.writeFileSync('./out.xlsx', buffer);
-});
+const testData = {
+    "reportBuildDate": "10.05.2018",
+    "taskCode": "CHL002",
+    "taskTechnicFio": "Бручко Андрей Техик",
+    "taskName": "CHECK LIST СКЛАДЫ И ЛОГИСТИЧЕСКИЕ КОМПЛЕКСЫ",
+    "taskDescription": "Провести осмотр нежилого помещения под склад и заполнить чек-лист",
+    "taskDateStart": "30.04.2018",
+    "taskDateEnd": "03.05.2018",
+    "taskDateComplete": "05.05.2018",
+    "objectCode": "CHL02",
+    "objectName": "Склад на улице Красной армии 11",
+    "results": [
+        {
+            "text": "Действительный  адрес объекта соответствует адресу, указанному в документах",
+            "answerText": "Да",
+            "comment": null,
+            "measuringName": "",
+            "measuringResult": ""
+        },
+        {
+            "text": "Укажите этажность здания (уточнить точную этажность, в т.ч. указать наличие цоколя, подвала, мансарды)",
+            "answerText": "Выполнено",
+            "comment": null,
+            "measuringName": "",
+            "measuringResult": ""
+        },
+        {
+            "text": "Условия для подъезда и разворота большегрузного транспорта",
+            "answerText": "Нет",
+            "comment": null,
+            "measuringName": "",
+            "measuringResult": ""
+        },
+        {
+            "text": "Подъездной путь",
+            "answerText": "Асфальтовое покрытие",
+            "comment": null,
+            "measuringName": "",
+            "measuringResult": ""
+        },
+        {
+            "text": "\nОкружающая застройка\n",
+            "answerText": "Административно-торговая",
+            "comment": null,
+            "measuringName": "",
+            "measuringResult": ""
+        }
+    ]
+};
 
-//let tpltFile = fs.readFileSync('./test.xlsx');
 
+// xlsxHelper.xlsxBuildByTemplate(testDataOld, 'xlsx.helper.template.xlsx')
+//     .then((buffer) => {
+//         fs.writeFileSync('./out1.xlsx', buffer);
+//     })
+//     .catch((error) => {
+//         console.log('xlsxHelper error:', error);
+//     });
 
-/*
-let wb = xlsx.readFile('test.xlsx');
-//console.log(wb);
-xlsx.writeFile(wb, 'out.xlsx');
-*/
-
-/*
-let ws = xlsx.parse(tpltFile);
-ws[0].data[1].push('OLOLOLOLOLO');
-console.log(ws[0].data[1]);
-fs.writeFileSync('./out.xlsx', xlsx.build(ws));
-*/
-
-/*
-let tpltUnzip = new zip();
-tpltUnzip.loadAsync(tpltFile).then(function() {
-  //console.log(tpltUnzip);
-  tpltUnzip.file('xl/worksheets/sheet1.xml').async('string').then(function(a) {
-    let out = a.replace('<? test ?>', '1234567890');
-    fs.writeFileSync('./test.xml', out);
-    tpltUnzip.file('xl/worksheets/sheet1.xml', out);
-    tpltUnzip.generateNodeStream({type:'nodebuffer',streamFiles:true})
-      .pipe(fs.createWriteStream('out.xlsx'))
-    //fs.writeFileSync('./out.xlsx', );
-  });
-});*/
+xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/template-1.xlsx')
+    .then((buffer) => {
+        fs.writeFileSync('./out2.xlsx', buffer);
+    })
+    .catch((error) => {
+        console.log('xlsxHelper error:', error);
+    });
