@@ -106,20 +106,64 @@ module.exports.xlsxBuildByTemplate2 = (data, templateFileName) => {
     return workbook.xlsx.readFile(templateFileName).then(() => {
         const wsh = new WorkSheetHelper(workbook.worksheets[0]);
 
-        wsh.cloneRows(34, 38, 5);
-        wsh.cloneRows(26, 28, 5);
+        // wsh.cloneRows(34, 38, 5);
+        // wsh.cloneRows(26, 28, 5);
+        //
+        // wsh.addImage(__dirname + '/alex.jpg', 29, 2);
+        // wsh.addImage(__dirname + '/alex.jpg', 32, 2);
+        // wsh.addImage(__dirname + '/alex.jpg', 35, 2);
+        // wsh.addImage(__dirname + '/alex.jpg', 31, 3);
+        // wsh.addImage(__dirname + '/alex.jpg', 35, 2);
 
-        wsh.addImage(__dirname + '/alex.jpg', 29, 2);
-        wsh.addImage(__dirname + '/alex.jpg', 32, 2);
-        wsh.addImage(__dirname + '/alex.jpg', 35, 2);
-        wsh.addImage(__dirname + '/alex.jpg', 31, 3);
-        wsh.addImage(__dirname + '/alex.jpg', 35, 2);
-
-        // wsh.processTemplates(new CellRange(wsh.worksheet.model.dimensions));
+        wsh.processTemplates(wsh.getSheetDimension(), data);
 
         return workbook.xlsx.writeBuffer();
     });
 };
+
+/**
+ * @property {string} template
+ * @property {object} data
+ * @property {?string} replaceText
+ */
+class TemplateString {
+    /**
+     * @param {string} template
+     * @param {object} data
+     */
+    constructor(template, data) {
+        this.template = template;
+        this.data = data;
+
+        this.replaceText = null;
+    }
+
+    /**
+     * @return {boolean}
+     */
+    parse() {
+        const reg = new RegExp('{{.+?}}', 'g');
+        const matches = this.template.match(reg);
+        if (!Array.isArray(matches) || !matches.length) {
+            return false;
+        }
+
+        this.replaceText = this.template;
+
+        matches.forEach((rawExp) => {
+            /** @const {string} expression */
+            const expression = rawExp.slice(2, -2);
+            /** @const {string[]} mainParts */
+            const mainParts = expression.split('|');
+            const valueName = mainParts[0];
+            const pipes = mainParts.slice(1); //todo: make pipes
+
+            this.replaceText = this.replaceText.replace(rawExp, this.data[valueName] || '');
+        });
+
+        return true;
+    }
+}
 
 /**
  * @property {Worksheet} worksheet
@@ -304,7 +348,19 @@ class WorkSheetHelper {
      * @param {object} data
      */
     replaceTemplates(cell, data) {
-        console.log('WorkSheetHelper.replaceTemplates', cell.address);
+        const cVal = cell.value;
+        if (typeof cVal !== "string") {
+            return;
+        }
+
+        const te = new TemplateString(cVal, data);
+        if (!te.parse()) {
+            return;
+        }
+
+        if (te.replaceText !== null) {
+            cell.value = te.replaceText;
+        }
     }
 }
 

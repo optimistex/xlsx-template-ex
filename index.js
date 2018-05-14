@@ -89,6 +89,32 @@ const testData = {
             "measuringName": "",
             "measuringResult": ""
         }
+    ],
+    steps: [
+        {
+            stepText: 'Текст шага инспекции 1',
+            media:[
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+            ]
+        },
+        {
+            stepText: 'Текст шага инспекции 2',
+            media:[
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+            ]
+        },
+        {
+            stepText: 'Текст шага инспекции 3',
+            media:[
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+            ]
+        },
     ]
 };
 
