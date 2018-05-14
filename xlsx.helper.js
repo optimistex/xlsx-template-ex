@@ -109,17 +109,10 @@ module.exports.xlsxBuildByTemplate2 = (data, templateFileName) => {
         const wsh = new WorkSheetHelper(workbook.worksheets[0]);
 
         // insertRow(workbook, 10);
-        // rowsCloneToBottom(workbook, 26, 28);
 
-        wsh.cloneRows(25, 27, 4);
-        // wsh.cloneRows(25, 27, 1);
-        // wsh.cloneRows(25, 27, 1);
-        // wsh.cloneRows(25, 27, 1);
+        wsh.cloneRows(33, 37, 5);
 
-        // rowsCloneToBottom(workbook, 19, 20);
-        // rowsCloneToBottom(workbook, 19, 20);
-        // rowsCloneToBottom(workbook, 19, 20);
-        // rowsCloneToBottom(workbook, 19, 20);
+        wsh.cloneRows(25, 27, 5);
 
         return workbook.xlsx.writeBuffer();
     });
@@ -162,14 +155,26 @@ class WorkSheetHelper {
      * @param {number} countClones
      */
     cloneRows(srcRowStart, srcRowEnd, countClones = 1) {
-        const dxRow = (srcRowEnd - srcRowStart + 1) * countClones;
+        srcRowStart++;
+        srcRowEnd++;
+        const countRows = srcRowEnd - srcRowStart + 1;
+        const dxRow = countRows * countClones;
         const lastRow = this.worksheet.dimensions['model'].bottom + dxRow;
 
-        for (let rowNumber = lastRow; rowNumber > srcRowStart; rowNumber--) {
-            // for (let rowNumber = lastRow; rowNumber > srcRowEnd; rowNumber--) {
-            const rowSrc = this.worksheet.getRow(rowNumber);
-            const rowDest = this.worksheet.getRow(rowNumber + dxRow);
-            this.copyRow(rowSrc, rowDest);
+        // Move rows below
+        for (let rowSrcNumber = lastRow; rowSrcNumber > srcRowEnd; rowSrcNumber--) {
+            const rowSrc = this.worksheet.getRow(rowSrcNumber);
+            const rowDest = this.worksheet.getRow(rowSrcNumber + dxRow);
+            this.moveRow(rowSrc, rowDest);
+        }
+
+        // Clone target rows
+        for (let rowSrcNumber = srcRowEnd; rowSrcNumber >= srcRowStart; rowSrcNumber--) {
+            const rowSrc = this.worksheet.getRow(rowSrcNumber);
+            for (let cloneNumber = countClones; cloneNumber > 0; cloneNumber--) {
+                const rowDest = this.worksheet.getRow(rowSrcNumber + countRows * cloneNumber);
+                this.copyRow(rowSrc, rowDest);
+            }
         }
     }
 
@@ -191,9 +196,16 @@ class WorkSheetHelper {
      * @param {Row} rowSrc
      * @param {Row} rowDest
      */
-    copyRow(rowSrc, rowDest) {
-        // rowDest.height = rowSrc.height;
+    moveRow(rowSrc, rowDest) {
+        this.copyRow(rowSrc, rowDest);
+        this.clearRow(rowSrc);
+    }
 
+    /**
+     * @param {Row} rowSrc
+     * @param {Row} rowDest
+     */
+    copyRow(rowSrc, rowDest) {
         /** @var {RowModel} */
         const rowModel = _.cloneDeep(rowSrc.model);
         rowModel.number = rowDest.number;
@@ -206,8 +218,6 @@ class WorkSheetHelper {
             const newCell = rowDest.getCell(colNumber);
             this.copyCell(cell, newCell);
         }
-
-        this.clearRow(rowSrc);
     }
 
     /**
@@ -217,7 +227,6 @@ class WorkSheetHelper {
     copyCell(cellSrc, cellDest) {
         // skip submerged cells
         if (cellSrc.isMerged && (cellSrc.type === Excel.ValueType.Merge)) {
-            // this.clearCell(cellDest);
             return;
         }
 
