@@ -104,32 +104,22 @@ module.exports.xlsxBuildByTemplate2 = (data, templateFileName) => {
 
     const workbook = new Excel.Workbook();
     return workbook.xlsx.readFile(templateFileName).then(() => {
-        // addImage(workbook, __dirname + '/alex.jpg', 25, 1);
-
         const wsh = new WorkSheetHelper(workbook.worksheets[0]);
 
-        // insertRow(workbook, 10);
+        wsh.cloneRows(34, 38, 5);
+        wsh.cloneRows(26, 28, 5);
 
-        wsh.cloneRows(33, 37, 5);
+        wsh.addImage(__dirname + '/alex.jpg', 29, 2);
+        wsh.addImage(__dirname + '/alex.jpg', 32, 2);
+        wsh.addImage(__dirname + '/alex.jpg', 35, 2);
+        wsh.addImage(__dirname + '/alex.jpg', 31, 3);
+        wsh.addImage(__dirname + '/alex.jpg', 35, 2);
 
-        wsh.cloneRows(25, 27, 5);
+        // wsh.processTemplates(new CellRange(wsh.worksheet.model.dimensions));
 
         return workbook.xlsx.writeBuffer();
     });
 };
-
-function addImage(workbook, fileName, row, col) {
-    const imgId = workbook.addImage({filename: fileName, extension: 'jpeg'});
-    const worksheet = workbook.worksheets[0];
-    const cell = worksheet.findCell(row, col);
-    if (cell && cell.isMerged) {
-        worksheet.mergeCells()
-    }
-    worksheet.addImage(imgId, {
-        tl: {col: col, row: row},
-        br: {col: col + 1, row: row + 1}
-    });
-}
 
 /**
  * @property {Worksheet} worksheet
@@ -150,16 +140,37 @@ class WorkSheetHelper {
     }
 
     /**
+     * @param {string} fileName
+     * @param {number} row
+     * @param {number} col
+     */
+    addImage(fileName, row, col) {
+        const imgId = this.workbook.addImage({filename: fileName, extension: 'jpeg'});
+
+        const cell = this.worksheet.getRow(row).getCell(col);
+        const cellRange = this.getMergeRange(cell);
+        if (cellRange) {
+            this.worksheet.addImage(imgId, {
+                tl: {col: cellRange.left - 0.99999, row: cellRange.top - 0.99999},
+                br: {col: cellRange.right, row: cellRange.bottom}
+            });
+        } else {
+            this.worksheet.addImage(imgId, {
+                tl: {col: cell.col - 0.99999, row: cell.row - 0.99999},
+                br: {col: cell.col, row: cell.row},
+            });
+        }
+    }
+
+    /**
      * @param {number} srcRowStart
      * @param {number} srcRowEnd
      * @param {number} countClones
      */
     cloneRows(srcRowStart, srcRowEnd, countClones = 1) {
-        srcRowStart++;
-        srcRowEnd++;
         const countRows = srcRowEnd - srcRowStart + 1;
         const dxRow = countRows * countClones;
-        const lastRow = this.worksheet.dimensions['model'].bottom + dxRow;
+        const lastRow = this.getSheetDimension().bottom + dxRow;
 
         // Move rows below
         for (let rowSrcNumber = lastRow; rowSrcNumber > srcRowEnd; rowSrcNumber--) {
@@ -180,14 +191,20 @@ class WorkSheetHelper {
 
     /**
      * @param {Cell} cell
-     * @return {(string|null)} e.g. `'A4:B5'` or null
+     * @return {CellRange}
      */
     getMergeRange(cell) {
         if (cell.isMerged && Array.isArray(this.worksheet.model['merges'])) {
             const address = cell.type === Excel.ValueType.Merge ? cell.master.address : cell.address;
-            return this.worksheet.model['merges'].find(item => {
-                return item.indexOf(address + ':') !== -1;
-            });
+            const cellRangeStr = this.worksheet.model['merges']
+                .find(item => item.indexOf(address + ':') !== -1);
+            if (cellRangeStr) {
+                const [cellTlAdr, cellBrAdr] = cellRangeStr.split(':', 2);
+                return CellRange.createFromCells(
+                    this.worksheet.getCell(cellTlAdr),
+                    this.worksheet.getCell(cellBrAdr)
+                );
+            }
         }
         return null;
     }
@@ -212,7 +229,7 @@ class WorkSheetHelper {
         rowModel.cells = [];
         rowDest.model = rowModel;
 
-        const lastCol = this.worksheet.dimensions['model'].right;
+        const lastCol = this.getSheetDimension().right;
         for (let colNumber = lastCol; colNumber > 0; colNumber--) {
             const cell = rowSrc.getCell(colNumber);
             const newCell = rowDest.getCell(colNumber);
@@ -235,18 +252,11 @@ class WorkSheetHelper {
         storeCellModel.address = cellDest.address;
 
         // Move a merge range
-        const mergeRangeStr = this.getMergeRange(cellSrc);
-        if (mergeRangeStr) {
-            const endRangeCell = this.worksheet.getCell(mergeRangeStr.split(':')[1]);
-            const dR = cellDest.row - cellSrc.row, dC = cellDest.col - cellSrc.col;
-            const mergeRange = {
-                top: cellSrc.row + dR,
-                left: cellSrc.col + dC,
-                right: endRangeCell.col + dC,
-                bottom: endRangeCell.row + dR
-            };
-            this.worksheet.unMergeCells(mergeRange.top, mergeRange.left, mergeRange.bottom, mergeRange.right);
-            this.worksheet.mergeCells(mergeRange.top, mergeRange.left, mergeRange.bottom, mergeRange.right);
+        const cellRange = this.getMergeRange(cellSrc);
+        if (cellRange) {
+            cellRange.move(cellDest.row - cellSrc.row, cellDest.col - cellSrc.col);
+            this.worksheet.unMergeCells(cellRange.top, cellRange.left, cellRange.bottom, cellRange.right);
+            this.worksheet.mergeCells(cellRange.top, cellRange.left, cellRange.bottom, cellRange.right);
         }
 
         cellDest.model = storeCellModel;
@@ -266,5 +276,76 @@ class WorkSheetHelper {
     clearCell(cell) {
         // noinspection JSValidateTypes
         cell.model = {address: cell.address};
+    }
+
+    getSheetDimension() {
+        const dm = this.worksheet.dimensions['model'];
+        return new CellRange(dm.top, dm.left, dm.bottom, dm.right);
+    }
+
+    /**
+     * @param {CellRange} cellRange
+     * @param {object} data
+     */
+    processTemplates(cellRange, data) {
+        for (let r = cellRange.bottom; r >= cellRange.top; r--) {
+            const row = this.worksheet.findRow(r);
+            for (let c = cellRange.right; c >= cellRange.left; c--) {
+                const cell = row.findCell(c);
+                if (cell) {
+                    this.replaceTemplates(cell, data);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param {Cell} cell
+     * @param {object} data
+     */
+    replaceTemplates(cell, data) {
+        console.log('WorkSheetHelper.replaceTemplates', cell.address);
+    }
+}
+
+/**
+ * @property {(number|string)} top
+ * @property {(number|string)} left
+ * @property {(number|string)} bottom
+ * @property {(number|string)} right
+ */
+class CellRange {
+    /**
+     * @param {(number|string)} top
+     * @param {(number|string)} left
+     * @param {(number|string)} bottom
+     * @param {(number|string)} right
+     */
+    constructor(top, left, bottom, right) {
+        this.top = top;
+        this.left = left;
+        this.bottom = bottom;
+        this.right = right;
+    }
+
+    /**
+     * @param {Cell} cellTL top left
+     * @param {Cell} cellBR bottom right
+     * @return {CellRange}
+     */
+    static createFromCells(cellTL, cellBR) {
+        return new CellRange(cellTL.row, cellTL.col, cellBR.row, cellBR.col);
+    }
+
+    /**
+     * @param {number} dRow
+     * @param {number} dCol
+     */
+    move(dRow, dCol) {
+        this.top += dRow;
+        this.bottom += dRow;
+
+        this.left += dCol;
+        this.right += dCol;
     }
 }
