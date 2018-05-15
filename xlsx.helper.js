@@ -168,7 +168,7 @@ class TemplateEngine {
         let restart;
         do {
             restart = false;
-            this.wsh.eachCellReverse(cellRange, (cell) => {
+            this.wsh.eachCell(cellRange, (cell) => {
                 let cVal = cell.value;
                 if (typeof cVal !== "string") {
                     return null;
@@ -182,7 +182,7 @@ class TemplateEngine {
                     const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
                     cVal = cVal.replace(tplExp.rawExpression, '');
                     cell.value = cVal;
-                    this.processBlockPipes(cell, tplExp.pipes, data[tplExp.valueName]);
+                    cellRange = this.processBlockPipes(cellRange, cell, tplExp.pipes, data[tplExp.valueName]);
                 });
 
                 restart = true;
@@ -238,19 +238,24 @@ class TemplateEngine {
     }
 
     /**
+     * @param {CellRange} cellRange
      * @param {Cell} cell
      * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
      * @param {object} data
+     * @return {CellRange} the new cell range
      */
-    processBlockPipes(cell, pipes, data) {
+    processBlockPipes(cellRange, cell, pipes, data) {
         // console.log('bp', pipes, data);
+        const newRange = CellRange.createFromRange(cellRange);
         pipes.forEach(pipe => {
             switch (pipe.pipeName) {
                 case 'repeat-rows':
-                    this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+                    const insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+                    newRange.bottom += insertedRows;
                     break;
             }
         });
+        return newRange;
     }
 
     /**
@@ -278,11 +283,12 @@ class TemplateEngine {
      * @param {Cell} cell
      * @param {object[]} dataArray
      * @param {number} countRows
+     * @return {number} count of inserted rows
      */
     blockPipeRepeatRows(cell, dataArray, countRows) {
         if (!Array.isArray(dataArray) || !dataArray.length) {
             console.warn('The data must be array, but got:', dataArray);
-            return;
+            return 0;
         }
         countRows = +countRows > 0 ? +countRows : 1;
         const startRow = cell.row;
@@ -298,6 +304,7 @@ class TemplateEngine {
             this.processValues(sectionRange, data);
             sectionRange.move(countRows, 0);
         });
+        return (dataArray.length - 1) * countRows;
     }
 }
 
@@ -551,6 +558,15 @@ class CellRange {
     }
 
     /**
+     * Just for clone
+     * @param range
+     * @return CellRange
+     */
+    static createFromRange(range) {
+        return new CellRange(range.top, range.left, range.bottom, range.right);
+    }
+
+    /**
      * @param {number} dRow
      * @param {number} dCol
      */
@@ -560,5 +576,15 @@ class CellRange {
 
         this.left += dCol;
         this.right += dCol;
+    }
+
+    /**
+     * @param range
+     */
+    grow(range) {
+        this.top = Math.min(this.top, range.top);
+        this.left = Math.min(this.left, range.left);
+        this.bottom = Math.max(this.bottom, range.bottom);
+        this.right = Math.max(this.right, range.right);
     }
 }
