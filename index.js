@@ -93,30 +93,36 @@ const testData = {
     steps: [
         {
             stepText: 'Текст шага инспекции 1',
-            fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+            // fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
             media: [
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.1111111'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.222222222'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.3333333'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.4444444444'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.5555555555'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.66666666'},
             ]
         },
         {
             stepText: 'Текст шага инспекции 2',
-            fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+            // fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
 
             media: [
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.1111111'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.222222222'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.3333333'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.4444444444'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.5555555555'},
+                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.66666666'},
             ]
         },
         {
             stepText: 'Текст шага инспекции 3',
-            fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+            // fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
             media: [
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.33333, 44.111111'},
+                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.333333333, 44.22222222'},
+                // {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
             ]
         },
     ]

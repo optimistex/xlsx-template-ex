@@ -163,6 +163,7 @@ class TemplateEngine {
     /**
      * @param {CellRange} cellRange
      * @param {object} data
+     * @return {CellRange} the new range
      */
     processBlocks(cellRange, data) {
         let restart;
@@ -189,6 +190,7 @@ class TemplateEngine {
                 return false;
             });
         } while (restart);
+        return cellRange;
     }
 
     /**
@@ -298,9 +300,10 @@ class TemplateEngine {
         }
 
         const wsDimension = this.wsh.getSheetDimension();
-        const sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
+        let sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
 
         dataArray.forEach(data => {
+            sectionRange = this.processBlocks(sectionRange, data);
             this.processValues(sectionRange, data);
             sectionRange.move(countRows, 0);
         });
