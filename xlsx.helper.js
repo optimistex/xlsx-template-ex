@@ -118,57 +118,32 @@ module.exports.xlsxBuildByTemplate2 = (data, templateFileName) => {
         // wsh.addImage(__dirname + '/alex.jpg', 31, 3);
         // wsh.addImage(__dirname + '/alex.jpg', 35, 2);
 
-        wsh.eachCell(wsh.getSheetDimension(), (cell) => {
-            console.log('iterate cells', cell.address);
-        });
-
-        wsh.processTemplates(wsh.getSheetDimension(), data);
-
         return workbook.xlsx.writeBuffer();
     });
 };
 
 /**
- * @property {string} template
- * @property {object} data
- * @property {?string} replaceText
+ * @property {string} rawExpression
+ * @property {string} expression
+ * @property {string} valueName
+ * @property {Array<{pipeName: string, pipeParameters: string[]}>} pipes
  */
-class TemplateString {
+class TemplateExpression {
     /**
-     * @param {string} template
-     * @param {object} data
+     * @param {string} rawExpression
+     * @param {string} expression
      */
-    constructor(template, data) {
-        this.template = template;
-        this.data = data;
-
-        this.replaceText = null;
-    }
-
-    /**
-     * @return {boolean}
-     */
-    parse() {
-        const reg = new RegExp('{{.+?}}', 'g');
-        const matches = this.template.match(reg);
-        if (!Array.isArray(matches) || !matches.length) {
-            return false;
-        }
-
-        this.replaceText = this.template;
-
-        matches.forEach((rawExp) => {
-            /** @const {string} expression */
-            const expression = rawExp.slice(2, -2);
-            /** @const {string[]} mainParts */
-            const mainParts = expression.split('|');
-            const valueName = mainParts[0];
-            const pipes = mainParts.slice(1); //todo: make pipes
-
-            this.replaceText = this.replaceText.replace(rawExp, this.data[valueName] || '');
+    constructor(rawExpression, expression) {
+        this.rawExpression = rawExpression;
+        this.expression = expression;
+        const expressionParts = this.expression.split('|');
+        this.valueName = expressionParts[0];
+        this.pipes = [];
+        const pipes = expressionParts.slice(1);
+        pipes.forEach(pipe => {
+            const pipeParts = pipe.split(':');
+            this.pipes.push({pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1)});
         });
-
-        return true;
     }
 }
 
@@ -184,10 +159,126 @@ class TemplateEngine {
     constructor(wsh, data) {
         this.wsh = wsh;
         this.data = data;
+        // noinspection RegExpRedundantEscape
+        this.regExpBlocks = /\[\[.+?\]\]/g;
+        this.regExpValues = /{{.+?}}/g;
     }
 
     execute() {
+        this.processBlocks(this.wsh.getSheetDimension(), this.data);
+        this.processValues(this.wsh.getSheetDimension(), this.data);
+    }
 
+    /**
+     * @param {CellRange} cellRange
+     * @param {object} data
+     */
+    processBlocks(cellRange, data) {
+        let restart;
+        do {
+            restart = false;
+            this.wsh.eachCell(cellRange, (cell) => {
+                // if (templateExpressions = this.parseExpressions(cell, data, this.regExpBlocks)) {
+                //
+                //     return false; // break
+                // }
+                let cVal = cell.value;
+                if (typeof cVal !== "string") {
+                    return null;
+                }
+                const matches = cVal.match(this.regExpBlocks);
+                if (!Array.isArray(matches) || !matches.length) {
+                    return null;
+                }
+
+                matches.forEach(rawExpression => {
+                    const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
+                    let resultValue = data[tplExp.valueName] || '';
+                    resultValue = this.processValuePipes(tplExp.pipes, resultValue);
+                    cVal = cVal.replace(tplExp.rawExpression, resultValue);
+                });
+                cell.value = cVal;
+
+                restart = true;
+                return false;
+            });
+        } while (restart);
+    }
+
+    /**
+     * @param {CellRange} cellRange
+     * @param {object} data
+     */
+    processValues(cellRange, data) {
+        this.wsh.eachCell(cellRange, (cell) => {
+            let cVal = cell.value;
+            if (typeof cVal !== "string") {
+                return;
+            }
+            const matches = cVal.match(this.regExpValues);
+            if (!Array.isArray(matches) || !matches.length) {
+                return;
+            }
+
+            matches.forEach(rawExpression => {
+                const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
+                let resultValue = data[tplExp.valueName] || '';
+                resultValue = this.processValuePipes(tplExp.pipes, resultValue);
+                cVal = cVal.replace(tplExp.rawExpression, resultValue);
+            });
+            cell.value = cVal;
+        });
+    }
+
+    /**
+     * @param {Cell} cell
+     * @param {object} data
+     * @param {RegExp} regExp
+     * @return {?TemplateExpression[]}
+     */
+    parseExpressions(cell, data, regExp) {
+        let cVal = cell.value;
+        if (typeof cVal !== "string") {
+            return null;
+        }
+
+        const matches = cVal.match(regExp);
+        if (!Array.isArray(matches) || !matches.length) {
+            return null;
+        }
+
+        const templateExpressions = [];
+        matches.forEach(rawExpression => {
+            const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
+            cVal = cVal.replace(tplExp.rawExpression, data[tplExp.valueName] || '');
+            templateExpressions.push(tplExp);
+        });
+        cell.value = cVal;
+        return templateExpressions;
+    }
+
+    /**
+     * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
+     * @param {string} value
+     * @return {string}
+     */
+    processValuePipes(pipes, value) {
+        pipes.forEach(pipe => {
+            switch (pipe.pipeName) {
+                case 'date':
+                    value = this.valuePipeDate.apply(this, [value].concat(pipe.pipeParameters));
+                    break;
+            }
+        });
+        return value;
+    }
+
+    /**
+     * @param {number|string} date
+     * @return {string}
+     */
+    valuePipeDate(date) {
+        return date ? (new Date(date)).toLocaleDateString() : '';
     }
 
     /**
@@ -387,7 +478,7 @@ class WorkSheetHelper {
             const row = this.worksheet.findRow(r);
             for (let c = cellRange.left; c <= cellRange.right; c++) {
                 const cell = row.findCell(c);
-                if (cell) {
+                if (cell && cell.type !== Excel.ValueType.Merge) {
                     if (callBack(cell) === false) {
                         return;
                     }
@@ -406,46 +497,12 @@ class WorkSheetHelper {
             const row = this.worksheet.findRow(r);
             for (let c = cellRange.right; c >= cellRange.left; c--) {
                 const cell = row.findCell(c);
-                if (cell) {
+                if (cell && cell.type !== Excel.ValueType.Merge) {
                     if (callBack(cell) === false) {
                         return;
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * @param {CellRange} cellRange
-     * @param {object} data
-     */
-    processTemplates(cellRange, data) {
-        let i = 0;
-        this.eachCellReverse(cellRange, cell => {
-            this.replaceTemplates(cell, data);
-            if (i++ > 5) {
-                return false;
-            }
-        });
-    }
-
-    /**
-     * @param {Cell} cell
-     * @param {object} data
-     */
-    replaceTemplates(cell, data) {
-        const cVal = cell.value;
-        if (typeof cVal !== "string") {
-            return;
-        }
-
-        const te = new TemplateString(cVal, data);
-        if (!te.parse()) {
-            return;
-        }
-
-        if (te.replaceText !== null) {
-            cell.value = te.replaceText;
         }
     }
 }
