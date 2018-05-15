@@ -177,11 +177,7 @@ class TemplateEngine {
         let restart;
         do {
             restart = false;
-            this.wsh.eachCell(cellRange, (cell) => {
-                // if (templateExpressions = this.parseExpressions(cell, data, this.regExpBlocks)) {
-                //
-                //     return false; // break
-                // }
+            this.wsh.eachCellReverse(cellRange, (cell) => {
                 let cVal = cell.value;
                 if (typeof cVal !== "string") {
                     return null;
@@ -193,11 +189,10 @@ class TemplateEngine {
 
                 matches.forEach(rawExpression => {
                     const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
-                    let resultValue = data[tplExp.valueName] || '';
-                    resultValue = this.processValuePipes(tplExp.pipes, resultValue);
-                    cVal = cVal.replace(tplExp.rawExpression, resultValue);
+                    cVal = cVal.replace(tplExp.rawExpression, '');
+                    cell.value = cVal;
+                    this.processBlockPipes(tplExp.pipes, data[tplExp.valueName]);
                 });
-                cell.value = cVal;
 
                 restart = true;
                 return false;
@@ -223,7 +218,7 @@ class TemplateEngine {
             matches.forEach(rawExpression => {
                 const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
                 let resultValue = data[tplExp.valueName] || '';
-                resultValue = this.processValuePipes(tplExp.pipes, resultValue);
+                resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
                 cVal = cVal.replace(tplExp.rawExpression, resultValue);
             });
             cell.value = cVal;
@@ -232,45 +227,44 @@ class TemplateEngine {
 
     /**
      * @param {Cell} cell
-     * @param {object} data
-     * @param {RegExp} regExp
-     * @return {?TemplateExpression[]}
-     */
-    parseExpressions(cell, data, regExp) {
-        let cVal = cell.value;
-        if (typeof cVal !== "string") {
-            return null;
-        }
-
-        const matches = cVal.match(regExp);
-        if (!Array.isArray(matches) || !matches.length) {
-            return null;
-        }
-
-        const templateExpressions = [];
-        matches.forEach(rawExpression => {
-            const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
-            cVal = cVal.replace(tplExp.rawExpression, data[tplExp.valueName] || '');
-            templateExpressions.push(tplExp);
-        });
-        cell.value = cVal;
-        return templateExpressions;
-    }
-
-    /**
      * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
      * @param {string} value
      * @return {string}
      */
-    processValuePipes(pipes, value) {
+    processValuePipes(cell, pipes, value) {
         pipes.forEach(pipe => {
             switch (pipe.pipeName) {
                 case 'date':
                     value = this.valuePipeDate.apply(this, [value].concat(pipe.pipeParameters));
                     break;
+                case 'image':
+                    value = this.valuePipeImage.apply(this, [cell, value].concat(pipe.pipeParameters));
+                    // value = 'todo: past image'; //todo: past image
+                    break;
             }
         });
         return value;
+    }
+
+    /**
+     * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
+     * @param {object} data
+     */
+    processBlockPipes(pipes, data) {
+        // console.log('bp', pipes, data);
+        pipes.forEach(pipe => {
+            switch (pipe.pipeName) {
+                case 'repeat-rows':
+                    this.blockPipeRepeatRows.apply(this, [data].concat(pipe.pipeParameters));
+                    break;
+                case 'block':
+                    this.blockPipeBlock.apply(this, [data].concat(pipe.pipeParameters));
+                    break;
+                case 'tile':
+
+                    break;
+            }
+        });
     }
 
     /**
@@ -282,17 +276,49 @@ class TemplateEngine {
     }
 
     /**
-     * @param {number} rowStart
-     * @param {number} RowStop
+     * @param {Cell} cell
+     * @param {string} fileName
+     * @return {string}
      */
-    pipeRepeatRows(rowStart, RowStop) {
+    valuePipeImage(cell, fileName) {
+        console.log('+++', fileName);
+
+        this.wsh.addImage(fileName, cell);
+
+        return fileName;
     }
 
     /**
+     * @param {object[]} dataArray
+     * @param {number} rowBeginAddr
+     * @param {number} rowEndAddr
+     */
+    blockPipeRepeatRows(dataArray, rowBeginAddr, rowEndAddr) {
+        if (!Array.isArray(dataArray) || !dataArray.length) {
+            console.warn('The data must be array', dataArray);
+            return;
+        }
+        const cellBegin = this.wsh.worksheet.getCell(rowBeginAddr);
+        const cellEnd = this.wsh.worksheet.getCell(rowEndAddr);
+        this.wsh.cloneRows(cellBegin.row, cellEnd.row, dataArray.length - 1);
+
+        const dRow = cellEnd.row - cellBegin.row + 1;
+        const wsDimension = this.wsh.getSheetDimension();
+        const sectionRange = new CellRange(cellBegin.row, wsDimension.left, cellEnd.row, wsDimension.right);
+
+        dataArray.forEach(data => {
+            this.processValues(sectionRange, data);
+            sectionRange.move(dRow, 0);
+        });
+    }
+
+    /**
+     * @param {object[]} data
      * @param {string} addrTopLeft
      * @param {string} addrBottomRight
      */
-    pipeBlock(addrTopLeft, addrBottomRight) {
+    blockPipeBlock(data, addrTopLeft, addrBottomRight) {
+        console.log('TemplateEngine.blockPipeBlock', data, addrTopLeft, addrBottomRight);
     }
 }
 
@@ -323,13 +349,11 @@ class WorkSheetHelper {
 
     /**
      * @param {string} fileName
-     * @param {number} row
-     * @param {number} col
+     * @param {Cell} cell
      */
-    addImage(fileName, row, col) {
+    addImage(fileName, cell) {
         const imgId = this.workbook.addImage({filename: fileName, extension: 'jpeg'});
 
-        const cell = this.worksheet.getRow(row).getCell(col);
         const cellRange = this.getMergeRange(cell);
         if (cellRange) {
             this.worksheet.addImage(imgId, {
@@ -345,8 +369,8 @@ class WorkSheetHelper {
     }
 
     /**
-     * @param {number} srcRowStart
-     * @param {number} srcRowEnd
+     * @param {number|string} srcRowStart
+     * @param {number|string} srcRowEnd
      * @param {number} countClones
      */
     cloneRows(srcRowStart, srcRowEnd, countClones = 1) {

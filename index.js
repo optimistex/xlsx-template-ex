@@ -64,7 +64,7 @@ const testData = {
         {
             "text": "Укажите этажность здания (уточнить точную этажность, в т.ч. указать наличие цоколя, подвала, мансарды)",
             "answerText": "Выполнено",
-            "comment": null,
+            "comment": 'Тестовый комментарий',
             "measuringName": "",
             "measuringResult": ""
         },
@@ -78,7 +78,7 @@ const testData = {
         {
             "text": "Подъездной путь",
             "answerText": "Асфальтовое покрытие",
-            "comment": null,
+            "comment": 'Тестовый комментарий',
             "measuringName": "",
             "measuringResult": ""
         },
@@ -93,7 +93,8 @@ const testData = {
     steps: [
         {
             stepText: 'Текст шага инспекции 1',
-            media:[
+            fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+            media: [
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
@@ -101,7 +102,9 @@ const testData = {
         },
         {
             stepText: 'Текст шага инспекции 2',
-            media:[
+            fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+
+            media: [
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
@@ -109,7 +112,8 @@ const testData = {
         },
         {
             stepText: 'Текст шага инспекции 3',
-            media:[
+            fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850',
+            media: [
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
                 {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.800744, 44.726850'},
