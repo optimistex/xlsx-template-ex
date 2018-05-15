@@ -131,7 +131,7 @@ const testData = {
 //         console.log('xlsxHelper error:', error);
 //     });
 
-xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/template-1.xlsx')
+xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/xlsx.helper.template.xlsx')
     .then((buffer) => {
         fs.writeFileSync('./out2.xlsx', buffer);
     })
