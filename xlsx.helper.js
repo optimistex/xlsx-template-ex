@@ -272,11 +272,11 @@ class TemplateEngine {
      * @return {string}
      */
     valuePipeImage(cell, fileName) {
-        console.log('+++', fileName);
-
-        this.wsh.addImage(fileName, cell);
-
-        return fileName;
+        if (fs.existsSync(fileName)) {
+            this.wsh.addImage(fileName, cell);
+            return fileName;
+        }
+        return `File "${fileName}" not found`;
     }
 
     /**
@@ -291,7 +291,9 @@ class TemplateEngine {
         }
         const cellBegin = this.wsh.worksheet.getCell(rowBeginAddr);
         const cellEnd = this.wsh.worksheet.getCell(rowEndAddr);
-        this.wsh.cloneRows(cellBegin.row, cellEnd.row, dataArray.length - 1);
+        if (dataArray.length > 1) {
+            this.wsh.cloneRows(cellBegin.row, cellEnd.row, dataArray.length - 1);
+        }
 
         const dRow = cellEnd.row - cellBegin.row + 1;
         const wsDimension = this.wsh.getSheetDimension();
