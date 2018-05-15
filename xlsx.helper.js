@@ -182,7 +182,7 @@ class TemplateEngine {
                     const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
                     cVal = cVal.replace(tplExp.rawExpression, '');
                     cell.value = cVal;
-                    this.processBlockPipes(tplExp.pipes, data[tplExp.valueName]);
+                    this.processBlockPipes(cell, tplExp.pipes, data[tplExp.valueName]);
                 });
 
                 restart = true;
@@ -238,21 +238,16 @@ class TemplateEngine {
     }
 
     /**
+     * @param {Cell} cell
      * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
      * @param {object} data
      */
-    processBlockPipes(pipes, data) {
+    processBlockPipes(cell, pipes, data) {
         // console.log('bp', pipes, data);
         pipes.forEach(pipe => {
             switch (pipe.pipeName) {
                 case 'repeat-rows':
-                    this.blockPipeRepeatRows.apply(this, [data].concat(pipe.pipeParameters));
-                    break;
-                case 'block':
-                    this.blockPipeBlock.apply(this, [data].concat(pipe.pipeParameters));
-                    break;
-                case 'tile':
-
+                    this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
                     break;
             }
         });
@@ -280,38 +275,29 @@ class TemplateEngine {
     }
 
     /**
+     * @param {Cell} cell
      * @param {object[]} dataArray
-     * @param {number} rowBeginAddr
-     * @param {number} rowEndAddr
+     * @param {number} countRows
      */
-    blockPipeRepeatRows(dataArray, rowBeginAddr, rowEndAddr) {
+    blockPipeRepeatRows(cell, dataArray, countRows) {
         if (!Array.isArray(dataArray) || !dataArray.length) {
-            console.warn('The data must be array', dataArray);
+            console.warn('The data must be array, but got:', dataArray);
             return;
         }
-        const cellBegin = this.wsh.worksheet.getCell(rowBeginAddr);
-        const cellEnd = this.wsh.worksheet.getCell(rowEndAddr);
+        countRows = +countRows > 0 ? +countRows : 1;
+        const startRow = cell.row;
+        const endRow = startRow + countRows - 1;
         if (dataArray.length > 1) {
-            this.wsh.cloneRows(cellBegin.row, cellEnd.row, dataArray.length - 1);
+            this.wsh.cloneRows(startRow, endRow, dataArray.length - 1);
         }
 
-        const dRow = cellEnd.row - cellBegin.row + 1;
         const wsDimension = this.wsh.getSheetDimension();
-        const sectionRange = new CellRange(cellBegin.row, wsDimension.left, cellEnd.row, wsDimension.right);
+        const sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
 
         dataArray.forEach(data => {
             this.processValues(sectionRange, data);
-            sectionRange.move(dRow, 0);
+            sectionRange.move(countRows, 0);
         });
-    }
-
-    /**
-     * @param {object[]} data
-     * @param {string} addrTopLeft
-     * @param {string} addrBottomRight
-     */
-    blockPipeBlock(data, addrTopLeft, addrBottomRight) {
-        console.log('TemplateEngine.blockPipeBlock', data, addrTopLeft, addrBottomRight);
     }
 }
 
