@@ -109,15 +109,6 @@ module.exports.xlsxBuildByTemplate2 = (data, templateFileName) => {
         const templateEngine = new TemplateEngine(wsh, data);
         templateEngine.execute();
 
-        // wsh.cloneRows(34, 38, 5);
-        // wsh.cloneRows(26, 28, 5);
-        //
-        // wsh.addImage(__dirname + '/alex.jpg', 29, 2);
-        // wsh.addImage(__dirname + '/alex.jpg', 32, 2);
-        // wsh.addImage(__dirname + '/alex.jpg', 35, 2);
-        // wsh.addImage(__dirname + '/alex.jpg', 31, 3);
-        // wsh.addImage(__dirname + '/alex.jpg', 35, 2);
-
         return workbook.xlsx.writeBuffer();
     });
 };
@@ -464,6 +455,17 @@ class WorkSheetHelper {
             this.worksheet.unMergeCells(cellRange.top, cellRange.left, cellRange.bottom, cellRange.right);
             this.worksheet.mergeCells(cellRange.top, cellRange.left, cellRange.bottom, cellRange.right);
         }
+
+        // Move an image
+        this.worksheet.getImages().forEach(image => {
+            const rng = image.range;
+            if (rng.tl.row <= cellSrc.row && rng.br.row >= cellSrc.row &&
+                rng.tl.col <= cellSrc.col && rng.br.col >= cellSrc.col) {
+                rng.tl.row += cellDest.row - cellSrc.row;
+                rng.br.row += cellDest.row - cellSrc.row;
+            }
+
+        });
 
         cellDest.model = storeCellModel;
     }
