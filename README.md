@@ -43,12 +43,13 @@ let data = {
 ```
     
 Составим шаблон:
-```markdown
+
+**!!!** В данном примере / указано вместо |
+
 | A | B |
 |---|---|
-|{{reportBuildDate/date}}| {{results|find:text:some text 2|get:answerText}} |
+|{{reportBuildDate/date}}| {{results/find:text:some text 2/get:answerText}} |
 |[[results/repeat-rows:1]] {{text}}| {{answerText}} |
-```
 
 Получим результат:
 

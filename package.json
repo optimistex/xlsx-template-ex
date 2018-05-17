@@ -8,12 +8,12 @@
   "author": "Konstantin Polyntsov <optimistex@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:optimistex/xlsx-template-ex.git"
+    "url": "git+ssh://git@gitlab.com:itorum/xlsx-template-ex.git"
   },
   "bugs": {
-    "url": "https://github.com/optimistex/xlsx-template-ex/issues"
+    "url": "https://gitlab.com/itorum/xlsx-template-ex/issues"
   },
-  "homepage": "https://github.com/optimistex/xlsx-template-ex#readme",
+  "homepage": "https://gitlab.com/itorum/xlsx-template-ex#readme",
   "scripts": {
     "start": "node example.js",
     "test": "echo \"Error: no test specified\" && exit 1"
