@@ -1,22 +1,37 @@
 {
-  "name": "xls-report",
-  "version": "1.0.0",
-  "description": "Module of excel-report generation by template for remote expert",
+  "name": "xls-report-ex",
+  "version": "0.0.3",
+  "description": "The template engine for generate xlsx documents",
+  "private": false,
+  "license": "MIT",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "author": "Konstantin Polyntsov <optimistex@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://arlio@bitbucket.org/arlio/xls-report.git"
+    "url": "git+ssh://git@github.com:optimistex/xlsx-template-ex.git"
   },
-  "author": "Arlio Bizarre",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/arlio/xls-report#readme",
+  "bugs": {
+    "url": "https://github.com/optimistex/xlsx-template-ex/issues"
+  },
+  "homepage": "https://github.com/optimistex/xlsx-template-ex#readme",
+  "scripts": {
+    "start": "node example.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "exceljs": "^1.4.6",
-    "lodash": "^4.17.10",
-    "xlsx-populate": "^1.16.0"
-  }
+    "lodash": "^4.17.10"
+  },
+  "contributors": [
+    {
+      "name": "Konstantin Polyntsov",
+      "email": "optimistex@gmail.com",
+      "url": "https://github.com/optimistex"
+    },
+    {
+      "name": "Arlio Bizarre",
+      "email": "vyacheslav.chub@valor-software.com",
+      "url": "https://bitbucket.org/arlio/"
+    }
+  ]
 }
