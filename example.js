@@ -1,5 +1,5 @@
 const fs = require('fs');
-const xlsxHelper = require('./src/xlsx.helper');
+const XlsxTemplate = require('.');
 
 const testData = {
     "reportBuildDate": "10.05.2018",
@@ -87,7 +87,7 @@ const testData = {
     ]
 };
 
-xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/test-data/template.xlsx')
+XlsxTemplate.xlsxBuildByTemplate(testData, __dirname + '/test-data/template.xlsx')
     .then((buffer) => {
         fs.writeFileSync('./out.xlsx', buffer);
     })
