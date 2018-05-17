@@ -1,46 +1,5 @@
 const fs = require('fs');
-const xlsxHelper = require('./xlsx.helper');
-
-const xlsxTemplate = require('./xlsx-template');
-
-const testDataOld = {
-    'name': 'Отчёт',
-    'date': '01.05.2018',
-    'users': [
-        {
-            'name': 'Иванов Пётр Семёнович',
-            'code': '00000001'
-        },
-        {
-            'name': 'Прокофьев Павел Сергеевич',
-            'code': '00000002'
-        },
-        {
-            'name': 'Аллаберганов Мадиёр Фарходович',
-            'code': '00000003'
-        }
-    ],
-    'orders': [
-        {
-            'number': '1',
-            'date': '25.04.2018',
-            'position': 'Хлеб',
-            'pts': '10'
-        },
-        {
-            'number': '2',
-            'date': '26.04.2018',
-            'position': 'Кефир',
-            'pts': '5'
-        },
-        {
-            'number': '2',
-            'date': '27.04.2018',
-            'position': 'Колбаса',
-            'pts': '2'
-        }
-    ]
-};
+const xlsxHelper = require('./src/xlsx.helper');
 
 const testData = {
     "reportBuildDate": "10.05.2018",
@@ -128,18 +87,9 @@ const testData = {
     ]
 };
 
-
-// xlsxHelper.xlsxBuildByTemplate(testDataOld, 'xlsx.helper.template.xlsx')
-//     .then((buffer) => {
-//         fs.writeFileSync('./out1.xlsx', buffer);
-//     })
-//     .catch((error) => {
-//         console.log('xlsxHelper error:', error);
-//     });
-
-xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/xlsx.helper.template.xlsx')
+xlsxHelper.xlsxBuildByTemplate2(testData, __dirname + '/test-data/template.xlsx')
     .then((buffer) => {
-        fs.writeFileSync('./out2.xlsx', buffer);
+        fs.writeFileSync('./out.xlsx', buffer);
     })
     .catch((error) => {
         console.log('xlsxHelper error:', error);
