@@ -14,6 +14,7 @@ const testData = {
     "objectName": "Склад на улице Красной армии 11",
     "results": [
         {
+            code: "I_SE_1",
             "text": "Действительный  адрес объекта соответствует адресу, указанному в документах",
             "answerText": "Да",
             "comment": null,
@@ -21,6 +22,7 @@ const testData = {
             "measuringResult": ""
         },
         {
+            code: "I_SE_2",
             "text": "Укажите этажность здания (уточнить точную этажность, в т.ч. указать наличие цоколя, подвала, мансарды)",
             "answerText": "Выполнено",
             "comment": 'Тестовый комментарий',
@@ -28,6 +30,7 @@ const testData = {
             "measuringResult": ""
         },
         {
+            code: "I_SE_3",
             "text": "Условия для подъезда и разворота большегрузного транспорта",
             "answerText": "Нет",
             "comment": null,
@@ -35,6 +38,7 @@ const testData = {
             "measuringResult": ""
         },
         {
+            code: "I_SE_4",
             "text": "Подъездной путь",
             "answerText": "Асфальтовое покрытие",
             "comment": 'Тестовый комментарий',
@@ -42,6 +46,7 @@ const testData = {
             "measuringResult": ""
         },
         {
+            code: "I_SE_5",
             "text": "\nОкружающая застройка\n",
             "answerText": "Административно-торговая",
             "comment": null,
@@ -87,7 +92,7 @@ const testData = {
     ]
 };
 
-XlsxTemplate.xlsxBuildByTemplate(testData, __dirname + '/test-data/template.xlsx')
+XlsxTemplate.xlsxBuildByTemplate(testData, __dirname + '/test-data/xlsx-template-ex.xlsx')
     .then((buffer) => {
         fs.writeFileSync('./out.xlsx', buffer);
     })

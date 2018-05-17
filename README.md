@@ -15,10 +15,13 @@
 
 ## Реализованные варианты выражений
 
-* `{{value}}` - вывод значения без обработки
-* `{{value|date}}` - значение форматируется как дата 
+* `{{propertyName}}` - вывод значения без обработки
+* `{{propertyName|date}}` - значение форматируется как дата 
 * `{{fileName|image}}` - производится поиск картинки по имени файла. 
-    Если картинка найдена, то она встраивается в ячейку таблицы 
+    Если картинка найдена, то она встраивается в ячейку таблицы
+* `{{propertyArrayName|find:propertyName:propertyValue}}` - поиск объекта в массиве `propertyArrayName` 
+    у которого есть свойство `propertyName` равное `propertyValue`
+* `{{propertyObjectName|get:propertyName}}` - возвращает значение свойства `propertyArrayName` из объекта `propertyObjectName`     
 
 * `[[array|repeat-rows:3]]` - обрабатать массив переменных и 
     вывести его содержимое в секцию из 3 строк начиная с текущей. 
@@ -40,17 +43,18 @@ let data = {
 ```
     
 Составим шаблон:
-
+```markdown
 | A | B |
 |---|---|
-|{{reportBuildDate/date}}|  |
+|{{reportBuildDate/date}}| {{results|find:text:some text 2|get:answerText}} |
 |[[results/repeat-rows:1]] {{text}}| {{answerText}} |
+```
 
 Получим результат:
 
 | A     | B     |
 |-------|-------|
-| 16.05.2018 |  |
+| 16.05.2018 | a text of an answer 2 |
 | some text 1 | a text of an answer 1 |
 | some text 2 | a text of an answer 2 |
 | some text 3 | a text of an answer 3 |

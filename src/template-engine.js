@@ -96,11 +96,16 @@ class TemplateEngine {
                     break;
                 case 'image':
                     value = this.valuePipeImage.apply(this, [cell, value].concat(pipe.pipeParameters));
-                    // value = 'todo: past image'; //todo: past image
+                    break;
+                case 'find':
+                    value = this.valuePipeFind.apply(this, [value].concat(pipe.pipeParameters));
+                    break;
+                case 'get':
+                    value = this.valuePipeGet.apply(this, [value].concat(pipe.pipeParameters));
                     break;
             }
         });
-        return value;
+        return value || '';
     }
 
     /**
@@ -143,6 +148,29 @@ class TemplateEngine {
             return fileName;
         }
         return `File "${fileName}" not found`;
+    }
+
+    /**
+     * Find object in array by value of a property
+     * @param {Array} arrayData
+     * @param {string} propertyName
+     * @param {string} propertyValue
+     */
+    valuePipeFind(arrayData, propertyName, propertyValue) {
+        if (Array.isArray(arrayData) && propertyName && propertyName) {
+            // noinspection EqualityComparisonWithCoercionJS
+            return arrayData.find(item => item && item[propertyName] == propertyValue);
+        }
+        return null;
+    }
+
+    /**
+     * Find object in array by value of a property
+     * @param {Array} data
+     * @param {string} propertyName
+     */
+    valuePipeGet(data, propertyName) {
+        return data && propertyName && data[propertyName] || null;
     }
 
     /**
