@@ -191,7 +191,9 @@ class TemplateEngine {
             if (propertyValue) {
                 return dataArray.filter(item => typeof item === "object" && item[propertyName] === propertyValue);
             }
-            return dataArray.filter(item => typeof item === "object" && item.hasOwnProperty(propertyName));
+            return dataArray.filter(item => typeof item === "object" &&
+                item.hasOwnProperty(propertyName) && item[propertyName]
+            );
         }
         return dataArray;
     }
