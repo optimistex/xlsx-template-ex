@@ -26,6 +26,11 @@
 * `[[array|repeat-rows:3]]` - обрабатать массив переменных и 
     вывести его содержимое в секцию из 3 строк начиная с текущей. 
     Строки будут продублированы в соответствии с размером массива.
+* `[[array|filter:propertyName:checkValue]]` - отфильтровать массив. 
+    Если указано только `propertyName`, то на выходе получим массив с объектами содержащими это поле.
+    Если указано `propertyName` и `checkValue`, то на выходе получим массив с объектами которые содержат 
+    свойство `propertyName` равное `checkValue`.
+        
     
 ## Примеры
 
@@ -38,6 +43,7 @@ let data = {
         { text: 'some text 1', answerText: 'a text of an answer 1'},
         { text: 'some text 2', answerText: 'a text of an answer 2'},
         { text: 'some text 3', answerText: 'a text of an answer 3'},
+        { answerText: 'a text of an answer 3'},
     ],
 };
 ```
@@ -49,7 +55,7 @@ let data = {
 | A | B |
 |---|---|
 |{{reportBuildDate/date}}| {{results/find:text:some text 2/get:answerText}} |
-|[[results/repeat-rows:1]] {{text}}| {{answerText}} |
+|[[results/filter:text/repeat-rows:1]] {{text}}| {{answerText}} |
 
 Получим результат:
 

@@ -104,6 +104,8 @@ class TemplateEngine {
                 case 'get':
                     value = this.valuePipeGet.apply(this, [value].concat(pipe.pipeParameters));
                     break;
+                default:
+                    console.log('The value pipe not found:', pipe.pipeName);
             }
         });
         return value || '';
@@ -125,6 +127,11 @@ class TemplateEngine {
                     const insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
                     newRange.bottom += insertedRows;
                     break;
+                case 'filter':
+                    data = this.blockPipeFilter.apply(this, [data].concat(pipe.pipeParameters));
+                    break;
+                default:
+                    console.warn('The block pipe not found:', pipe.pipeName, pipe.pipeParameters);
             }
         });
         return newRange;
@@ -135,7 +142,6 @@ class TemplateEngine {
      * @return {string}
      */
     valuePipeDate(date) {
-        console.log('TemplateEngine.valuePipeDate', date);
         return date ? moment(new Date(date)).format('DD.MM.YYYY') : '';
     }
 
@@ -173,6 +179,21 @@ class TemplateEngine {
      */
     valuePipeGet(data, propertyName) {
         return data && propertyName && data[propertyName] || null;
+    }
+
+    /**
+     * @param dataArray
+     * @param propertyName
+     * @param propertyValue
+     */
+    blockPipeFilter(dataArray, propertyName, propertyValue) {
+        if (Array.isArray(dataArray) && propertyName) {
+            if (propertyValue) {
+                return dataArray.filter(item => typeof item === "object" && item[propertyName] === propertyValue);
+            }
+            return dataArray.filter(item => typeof item === "object" && item.hasOwnProperty(propertyName));
+        }
+        return dataArray;
     }
 
     /**

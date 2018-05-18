@@ -44,8 +44,8 @@ const testData = {
         "measureValue": null,
         "media": [{
             "fileName": "/data/www/itorum-backend/upload/answers/image-1526461829069.jpeg",
-            "created": null,
-            "gpsPos": ""
+            "created": new Date(),
+            "gpsPos": "+++++"
         }, {
             "fileName": "/data/www/itorum-backend/upload/answers/image-1526461829069.jpeg",
             "created": null,

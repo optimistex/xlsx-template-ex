@@ -21,10 +21,12 @@ module.exports.xlsxBuildByTemplate = (data, templateFileName) => {
 
     const workbook = new Excel.Workbook();
     return workbook.xlsx.readFile(templateFileName).then(() => {
-        const wsh = new WorkSheetHelper(workbook.worksheets[0]);
 
-        const templateEngine = new TemplateEngine(wsh, data);
-        templateEngine.execute();
+        workbook.worksheets.forEach(worksheet => {
+            const wsh = new WorkSheetHelper(worksheet);
+            const templateEngine = new TemplateEngine(wsh, data);
+            templateEngine.execute();
+        });
 
         return workbook.xlsx.writeBuffer();
     });

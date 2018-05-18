@@ -1,6 +1,6 @@
 {
   "name": "xls-report-ex",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
