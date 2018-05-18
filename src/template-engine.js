@@ -1,4 +1,5 @@
 const fs = require('fs');
+const moment = require('moment');
 const CellRange = require('./cell-range');
 const TemplateExpression = require('./template-expression');
 
@@ -134,7 +135,8 @@ class TemplateEngine {
      * @return {string}
      */
     valuePipeDate(date) {
-        return date ? (new Date(date)).toLocaleDateString() : '';
+        console.log('TemplateEngine.valuePipeDate', date);
+        return date ? moment(new Date(date)).format('DD.MM.YYYY') : '';
     }
 
     /**
@@ -181,7 +183,7 @@ class TemplateEngine {
      */
     blockPipeRepeatRows(cell, dataArray, countRows) {
         if (!Array.isArray(dataArray) || !dataArray.length) {
-            console.warn('The data must be array, but got:', dataArray);
+            console.warn(cell.address, 'The data must be not empty array, but got:', dataArray);
             return 0;
         }
         countRows = +countRows > 0 ? +countRows : 1;

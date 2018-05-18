@@ -2,89 +2,216 @@ const fs = require('fs');
 const XlsxTemplate = require('.');
 
 const testData = {
-    "reportBuildDate": "10.05.2018",
-    "taskCode": "CHL002",
-    "taskTechnicFio": "Бручко Андрей Техик",
-    "taskName": "CHECK LIST СКЛАДЫ И ЛОГИСТИЧЕСКИЕ КОМПЛЕКСЫ",
-    "taskDescription": "Провести осмотр нежилого помещения под склад и заполнить чек-лист",
-    "taskDateStart": "30.04.2018",
-    "taskDateEnd": "03.05.2018",
-    "taskDateComplete": "05.05.2018",
-    "objectCode": "CHL02",
-    "objectName": "Склад на улице Красной армии 11",
-    "results": [
-        {
-            code: "I_SE_1",
-            "text": "Действительный  адрес объекта соответствует адресу, указанному в документах",
-            "answerText": "Да",
-            "comment": null,
-            "measuringName": "",
-            "measuringResult": ""
-        },
-        {
-            code: "I_SE_2",
-            "text": "Укажите этажность здания (уточнить точную этажность, в т.ч. указать наличие цоколя, подвала, мансарды)",
-            "answerText": "Выполнено",
-            "comment": 'Тестовый комментарий',
-            "measuringName": "",
-            "measuringResult": ""
-        },
-        {
-            code: "I_SE_3",
-            "text": "Условия для подъезда и разворота большегрузного транспорта",
-            "answerText": "Нет",
-            "comment": null,
-            "measuringName": "",
-            "measuringResult": ""
-        },
-        {
-            code: "I_SE_4",
-            "text": "Подъездной путь",
-            "answerText": "Асфальтовое покрытие",
-            "comment": 'Тестовый комментарий',
-            "measuringName": "",
-            "measuringResult": ""
-        },
-        {
-            code: "I_SE_5",
-            "text": "\nОкружающая застройка\n",
-            "answerText": "Административно-торговая",
-            "comment": null,
-            "measuringName": "",
-            "measuringResult": ""
-        }
-    ],
-    steps: [
-        {
-            stepText: 'Текст шага инспекции 1',
-            media: [
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.1111111'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.222222222'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.3333333'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.4444444444'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.5555555555'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.66666666'},
-            ]
-        },
-        {
-            stepText: 'Текст шага инспекции 2',
-            media: [
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.1111111'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.222222222'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.3333333'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.4444444444'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.2222222, 44.5555555555'},
-                {fileName: __dirname + '/152.jpg', created: new Date(), gpsPos: '48.2222222, 44.66666666'},
-            ]
-        },
-        {
-            stepText: 'Текст шага инспекции 3',
-            media: [
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.33333, 44.111111'},
-                {fileName: __dirname + '/alex.jpg', created: new Date(), gpsPos: '48.333333333, 44.22222222'},
-            ]
-        },
-    ]
+    "reportBuildDate": "2018-05-18T18:11:14.227Z",
+    "taskCode": "ISE4",
+    "taskTechnicFio": "Полиненко Сергей специалист",
+    "taskName": "Инспекция №4",
+    "taskDescription": "CHECK LIST ОФИСНО-ТОРГОВАЯ, ПРОИЗВОДСТВЕННО-СКЛАСДКАЯ НЕДВИЖИМОСТЬ (КЛАССА НИЖЕ А И В)",
+    "taskDateStart": "15.05.2018",
+    "taskDateEnd": "25.05.2018",
+    "taskDateComplete": "16.05.2018",
+    "objectCode": "SE-1",
+    "objectName": "Офисное здание, 4 этажа",
+    "results": [{
+        "text": "Инженерные коммуникации: Электричество. Уточнить размер выделенной мощности (кВт).",
+        "answerText": "Нет электричества",
+        "comment": "",
+        "measureValue": "28"
+    }, {
+        "text": "Укажите количество мест для парковки и выберите тип",
+        "answerText": "Бесплатная наземная",
+        "comment": "",
+        "measureValue": "3"
+    }, {
+        "text": "Проверьте наличие на участке других объектов недвижимости. Если они есть, зафиксируйте длину и ширину каждого. Используйте знак препинания в качестве разделителя.",
+        "answerText": "Другие объекты отсутствуют",
+        "comment": "",
+        "measureValue": "34"
+    }, {
+        "text": "Укажите этажность здания",
+        "answerText": "более 2-х этажей",
+        "comment": "",
+        "measureValue": "5"
+    }, {
+        "text": "Действительный  адрес объекта соответствует адресу, указанному в документах?",
+        "answerText": "Производственно-складская",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Конструктив здания: сфотографируйте фундамент и дефекты, если есть",
+        "answerText": "Нет дефектов",
+        "comment": "",
+        "measureValue": null,
+        "media": [{
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461829069.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461829069.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }]
+    }, {
+        "text": "Конструктив здания: сфотографируйте стены и дефекты в них, если есть",
+        "answerText": "Нет дефектов в стенах",
+        "comment": "",
+        "measureValue": null,
+        "media": [{
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }, {
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }]
+    }, {
+        "text": "Конструктив здания: сфотографируйте перекрытия и дефекты в них, если есть",
+        "answerText": "Нет дефектов",
+        "comment": "",
+        "measureValue": null,
+        "media": [{
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461838603.jpeg",
+            "created": null,
+            "gpsPos": ""
+        }]
+    }, {
+        "text": "Есть ли перепланировки? Уточните какие.",
+        "answerText": "Изменение материала внешних стен",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните тип отопления",
+        "answerText": "Централизованное",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните тип канализации",
+        "answerText": "Централизованное",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: укажите тип газоснабжения",
+        "answerText": "Другое",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: укажите тип водоснабжения",
+        "answerText": "Централизованное",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните наличие вентиляции",
+        "answerText": "Есть",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Укажите какой подъездной путь",
+        "answerText": "Да",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните наличие системы кондиционирования и вентиляции",
+        "answerText": "Есть",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните наличие системы охраны и видеонаблюдения",
+        "answerText": "Есть",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: уточните наличие системы пожарной сигнализации",
+        "answerText": "Есть",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Инженерные коммуникации: другое (при наличии)",
+        "answerText": "Нет",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Наличие трудно демонтируемого оборудования на объекте осмотра",
+        "answerText": "Нет",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Линия домов",
+        "answerText": "Да",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Окружающая застройка",
+        "answerText": "Да",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Наличие отдельного входа",
+        "answerText": "Есть",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Проведите осмотр состояния объекта",
+        "answerText": "Отличное",
+        "comment": "",
+        "measureValue": null
+    }, {
+        "text": "Доступ был предоставлен в 100% площадей объекта? Рассчитайте % площадей от общей площади объекта, в которые попасть не удалось.",
+        "answerText": "Да (доступ был к 100% площадей)",
+        "comment": "",
+        "measureValue": "100"
+    }, {
+        "text": "Укажите % текущего использования помещений объекта в соответствии с результатами визуального осмотра (в т.ч. основных арендаторов).",
+        "answerText": "Выполнено",
+        "comment": "",
+        "measureValue": "28"
+    }, {
+        "text": "Наличие вспомогательного оборудования на объекте осмотра",
+        "answerText": "Другое технологическое оборудование",
+        "comment": "",
+        "measureValue": null
+    }],
+    "steps": []
 };
 
 XlsxTemplate.xlsxBuildByTemplate(testData, __dirname + '/test-data/xlsx-template-ex.xlsx')

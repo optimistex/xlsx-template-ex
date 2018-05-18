@@ -1,6 +1,6 @@
 {
   "name": "xls-report-ex",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "exceljs": "^1.4.6",
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.10",
+    "moment": "^2.22.1"
   },
   "contributors": [
     {
