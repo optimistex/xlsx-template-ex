@@ -1,40 +1,43 @@
-# Excel Шаблонизатор
+# Excel template engine
 
-Поддерживаемые файлы: **xlsx**
+Supported files: **xlsx**
 
-## Синтаксис
+The component implements making some template-based reports.
+It has the flexible syntax similar to template expressions in the Angular framework. 
 
-Поддерживается 2 вида выражений:
-* Вывод значения переменной: `{{value|pipe:arg1:argN}}`
-* Вывод массива переменных: `[[value|pipe:arg1:argN]]`
+## The syntax
 
-Где:
-* `value` - некоторое значение или массив
-* `pipe` - некоторая функция дополнительной обработки значения
-* `arg1`, `argN` - агрументы/параметры передаваемые в функцию обработки значения
+Supported 2 types of expressions:
+* Output a property value: `{{value|pipe:arg1:argN}}`
+* Output an array data: `[[value|pipe:arg1:argN]]`
 
-## Реализованные варианты выражений
+Where:
+* `value` - name of property that contain some value or an array
+* `pipe` - some function for additional processing some value
+* `arg1`, `argN` - arguments/parameters passing to a pipe function
 
-* `{{propertyName}}` - вывод значения без обработки
-* `{{propertyName|date}}` - значение форматируется как дата 
-* `{{fileName|image}}` - производится поиск картинки по имени файла. 
-    Если картинка найдена, то она встраивается в ячейку таблицы
-* `{{propertyArrayName|find:propertyName:propertyValue}}` - поиск объекта в массиве `propertyArrayName` 
-    у которого есть свойство `propertyName` равное `propertyValue`
-* `{{propertyObjectName|get:propertyName}}` - возвращает значение свойства `propertyArrayName` из объекта `propertyObjectName`     
+## Implemented expression variants
 
-* `[[array|repeat-rows:3]]` - обрабатать массив переменных и 
-    вывести его содержимое в секцию из 3 строк начиная с текущей. 
-    Строки будут продублированы в соответствии с размером массива.
-* `[[array|filter:propertyName:checkValue]]` - отфильтровать массив. 
-    Если указано только `propertyName`, то на выходе получим массив с объектами содержащими это поле.
-    Если указано `propertyName` и `checkValue`, то на выходе получим массив с объектами которые содержат 
-    свойство `propertyName` равное `checkValue`.
+* `{{propertyName}}` - out put a value as is
+* `{{propertyName|date}}` - the value formatted as date 
+* `{{fileName|image}}` - find a picture file by file name. 
+    If the picture found, then it embed into a table cell 
+* `{{propertyArrayName|find:propertyName:propertyValue}}` - fund a value in the array `propertyArrayName` 
+    that has the property `propertyName` that equal `propertyValue`
+* `{{propertyObjectName|get:propertyName}}` - return a value of the property `propertyArrayName` from the object `propertyObjectName`     
+
+* `[[array|repeat-rows:3]]` - process the array of values and output the content 
+    into the section from 3 rows started from current.
+    The rows will be duplicated according to the size of the array.
+* `[[array|filter:propertyName:checkValue]]` - filter the array. 
+    If provided only `propertyName`, then We will get an array of objects that contain the property.
+    If provided `propertyName` and `checkValue`, then We will get an array of objects that contain 
+    the property `propertyName` with value `checkValue`.
         
     
-## Примеры
+## Examples
 
-Будем выводить в шаблонизаторе такие данные:
+We will output this data:
 ```javascript
 let data = {
     reportBuildDate: 1526443275041,
@@ -48,16 +51,16 @@ let data = {
 };
 ```
     
-Составим шаблон:
+Let's make a template:
 
-**!!!** В данном примере / указано вместо |
+**!!!** In the example / used instead of | because of a trouble with the markdown syntax 
 
 | A | B |
 |---|---|
 |{{reportBuildDate/date}}| {{results/find:text:some text 2/get:answerText}} |
 |[[results/filter:text/repeat-rows:1]] {{text}}| {{answerText}} |
 
-Получим результат:
+Received result:
 
 | A     | B     |
 |-------|-------|
@@ -65,3 +68,22 @@ let data = {
 | some text 1 | a text of an answer 1 |
 | some text 2 | a text of an answer 2 |
 | some text 3 | a text of an answer 3 |
+
+## Troubleshooting
+
+Please follow this guidelines when reporting bugs and feature requests:
+
+1. Use [GitHub Issues](https://github.com/optimistex/xlsx-template-ex/issues) board to report bugs and feature requests (not our email address)
+2. Please **always** write steps to reproduce the error. That way we can focus on fixing the bug, not scratching our heads trying to reproduce it.
+
+Thanks for understanding!
+
+## Contribute
+
+- `npm start` - Run demo for local debugging.
+
+The library has no some special build. 
+
+# License
+
+The MIT License (see the [LICENSE](https://github.com/optimistex/ngx-select-ex/blob/master/LICENSE) file for the full text)
