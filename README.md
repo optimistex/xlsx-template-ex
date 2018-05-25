@@ -22,7 +22,7 @@ Where:
 * `{{propertyName|date}}` - the value formatted as date 
 * `{{fileName|image}}` - find a picture file by file name. 
     If the picture found, then it embed into a table cell 
-* `{{propertyArrayName|find:propertyName:propertyValue}}` - fund a value in the array `propertyArrayName` 
+* `{{propertyArrayName|find:propertyName:propertyValue}}` - find a value in the array `propertyArrayName` 
     that has the property `propertyName` that equal `propertyValue`
 * `{{propertyObjectName|get:propertyName}}` - return a value of the property `propertyArrayName` from the object `propertyObjectName`     
 
