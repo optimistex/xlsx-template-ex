@@ -59,47 +59,47 @@ const testData = {
         "comment": "",
         "measureValue": null,
         "media": [{
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-1.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-2.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-3.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-4.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-5.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-6.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-7.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-8.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-9.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-10.jpeg",
             "created": null,
             "gpsPos": ""
         }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
+            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615-11.jpeg",
             "created": null,
             "gpsPos": ""
         }]

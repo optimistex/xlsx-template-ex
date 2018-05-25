@@ -264,6 +264,13 @@ class TemplateEngine {
 
         let tileColumn = 1, tileRange = CellRange.createFromRange(blockRange);
         dataArray.forEach((data, idx, array) => {
+            // Prepare the next tile
+            if ((idx !== array.length - 1) && (tileColumn + 1 <= tileColumns)) {
+                const nextTileRange = CellRange.createFromRange(tileRange);
+                nextTileRange.move(0, tileRange.countColumns);
+                this.wsh.copyCellRange(tileRange, nextTileRange);
+            }
+
             // Process templates
             tileRange = this.processBlocks(tileRange, data);
             this.processValues(tileRange, data);
@@ -272,9 +279,7 @@ class TemplateEngine {
             if (idx !== array.length - 1) {
                 tileColumn++;
                 if (tileColumn <= tileColumns) {
-                    const oldTileRange = CellRange.createFromRange(tileRange);
                     tileRange.move(0, tileRange.countColumns);
-                    this.wsh.copyCellRange(oldTileRange, tileRange);
                 } else {
                     tileColumn = 1;
                     blockRange.move(tileRange.countRows, 0);
