@@ -115,16 +115,22 @@ class TemplateEngine {
      * @param {CellRange} cellRange
      * @param {Cell} cell
      * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
-     * @param {object} data
+     * @param {object|object[]} data
      * @return {CellRange} the new cell range
      */
     processBlockPipes(cellRange, cell, pipes, data) {
         // console.log('bp', pipes, data);
         const newRange = CellRange.createFromRange(cellRange);
+        let insertedRows;
         pipes.forEach(pipe => {
             switch (pipe.pipeName) {
                 case 'repeat-rows':
-                    const insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+                    // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+                    insertedRows = this.blockPipeRepeatRows(cell, data, ...pipe.pipeParameters);
+                    newRange.bottom += insertedRows;
+                    break;
+                case 'tile':
+                    insertedRows = this.blockPipeTile(cell, data, ...pipe.pipeParameters);
                     newRange.bottom += insertedRows;
                     break;
                 case 'filter':
@@ -206,7 +212,9 @@ class TemplateEngine {
      */
     blockPipeRepeatRows(cell, dataArray, countRows) {
         if (!Array.isArray(dataArray) || !dataArray.length) {
-            console.warn(cell.address, 'The data must be not empty array, but got:', dataArray);
+            console.warn('TemplateEngine.blockPipeRepeatRows', cell.address,
+                'The data must be not empty array, but got:', dataArray
+            );
             return 0;
         }
         countRows = +countRows > 0 ? +countRows : 1;
@@ -225,6 +233,57 @@ class TemplateEngine {
             sectionRange.move(countRows, 0);
         });
         return (dataArray.length - 1) * countRows;
+    }
+
+    /**
+     *
+     * @param {Cell} cell
+     * @param {object[]} dataArray
+     * @param {number} blockRows the number rows of the block
+     * @param {number} blockColumns the number rows of the block
+     * @param {number} tileColumns the number columns to repeat the block
+     * @return {number} count of inserted rows
+     */
+    blockPipeTile(cell, dataArray, blockRows, blockColumns, tileColumns) {
+        // return;
+        if (!Array.isArray(dataArray) || !dataArray.length) {
+            console.warn('TemplateEngine.blockPipeTile', cell.address,
+                'The data must be not empty array, but got:', dataArray
+            );
+            return 0;
+        }
+        blockRows = +blockRows > 0 ? +blockRows : 1;
+        blockColumns = +blockColumns > 0 ? +blockColumns : 1;
+        tileColumns = +tileColumns > 0 ? +tileColumns : 1;
+
+        const blockRange = new CellRange(cell.row, cell.col, cell.row + blockRows - 1, cell.col + blockColumns - 1);
+        const cloneRowsCount = Math.ceil(dataArray.length / tileColumns) - 1;
+        if (dataArray.length > tileColumns) {
+            this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount);
+        }
+
+        let tileColumn = 1, tileRange = CellRange.createFromRange(blockRange);
+        dataArray.forEach((data, idx, array) => {
+            // Process templates
+            tileRange = this.processBlocks(tileRange, data);
+            this.processValues(tileRange, data);
+
+            // Move tiles
+            if (idx !== array.length - 1) {
+                tileColumn++;
+                if (tileColumn <= tileColumns) {
+                    const oldTileRange = CellRange.createFromRange(tileRange);
+                    tileRange.move(0, tileRange.countColumns);
+                    this.wsh.copyCellRange(oldTileRange, tileRange);
+                } else {
+                    tileColumn = 1;
+                    blockRange.move(tileRange.countRows, 0);
+                    tileRange = CellRange.createFromRange(blockRange);
+                }
+            }
+        });
+
+        return cloneRowsCount * blockRange.countRows;
     }
 }
 

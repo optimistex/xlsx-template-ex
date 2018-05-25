@@ -160,6 +160,26 @@ class WorkSheetHelper {
     }
 
     /**
+     * @param {CellRange} rangeSrc
+     * @param {CellRange} rangeDest
+     */
+    copyCellRange(rangeSrc, rangeDest) {
+        if (rangeSrc.countRows !== rangeDest.countRows || rangeSrc.countColumns !== rangeDest.countColumns) {
+            console.warn('WorkSheetHelper.copyCellRange',
+                'The cell ranges must have an equal size', rangeSrc, rangeDest
+            );
+            return;
+        }
+        // todo: check intersection in the CellRange class
+        const dRow = rangeDest.bottom - rangeSrc.bottom;
+        const dCol = rangeDest.right - rangeSrc.right;
+        this.eachCellReverse(rangeSrc, (cellSrc) => {
+            const cellDest = this.worksheet.getCell(cellSrc.row + dRow, cellSrc.col + dCol);
+            this.copyCell(cellSrc, cellDest);
+        });
+    }
+
+    /**
      * @param {Row} row
      */
     clearRow(row) {

@@ -33,7 +33,9 @@ Where:
     If provided only `propertyName`, then We will get an array of objects that contain the property.
     If provided `propertyName` and `checkValue`, then We will get an array of objects that contain 
     the property `propertyName` with value `checkValue`.
-        
+* `[[array|tile:blockRows:blockColumns:tileColumns]]` - process the array of values and output the data by blocks.
+    The source block defines by `blockRows` and `blockColumns`. 
+    The block will be output in a grid with `tileColumns` number columns. 
     
 ## Examples
 
@@ -59,6 +61,8 @@ Let's make a template:
 |---|---|
 |{{reportBuildDate/date}}| {{results/find:text:some text 2/get:answerText}} |
 |[[results/filter:text/repeat-rows:1]] {{text}}| {{answerText}} |
+| | |
+| [[results/filter:text/tile:1:1:2]]{{answerText}} | |
 
 Received result:
 
@@ -68,6 +72,9 @@ Received result:
 | some text 1 | a text of an answer 1 |
 | some text 2 | a text of an answer 2 |
 | some text 3 | a text of an answer 3 |
+| | |
+| a text of an answer 1 | a text of an answer 2 |
+| a text of an answer 3 | |
 
 ## Troubleshooting
 

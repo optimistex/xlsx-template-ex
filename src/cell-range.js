@@ -37,6 +37,20 @@ class CellRange {
     }
 
     /**
+     * @return {number}
+     */
+    get countRows() {
+        return this.bottom - this.top + 1;
+    }
+
+    /**
+     * @return {number}
+     */
+    get countColumns() {
+        return this.right - this.left + 1;
+    }
+
+    /**
      * @param {number} dRow
      * @param {number} dCol
      */

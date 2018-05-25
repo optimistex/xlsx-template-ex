@@ -40,7 +40,7 @@ const testData = {
         "media": null,
         "measureValue": null
     }, {
-        "text": "Конструктив здания: сфотографируйте фундамент и дефекты, если есть",
+        "text": "1 Конструктив здания: сфотографируйте фундамент и дефекты, если есть",
         "answerText": "Нет дефектов",
         "comment": "",
         "measureValue": null,
@@ -54,7 +54,7 @@ const testData = {
             "gpsPos": ""
         }]
     }, {
-        "text": "Конструктив здания: сфотографируйте стены и дефекты в них, если есть",
+        "text": "2 Конструктив здания: сфотографируйте стены и дефекты в них, если есть",
         "answerText": "Нет дефектов в стенах",
         "comment": "",
         "measureValue": null,
@@ -102,13 +102,9 @@ const testData = {
             "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
             "created": null,
             "gpsPos": ""
-        }, {
-            "fileName": "/data/www/itorum-backend/upload/answers/image-1526461833615.jpeg",
-            "created": null,
-            "gpsPos": ""
         }]
     }, {
-        "text": "Конструктив здания: сфотографируйте перекрытия и дефекты в них, если есть",
+        "text": "3 Конструктив здания: сфотографируйте перекрытия и дефекты в них, если есть",
         "answerText": "Нет дефектов",
         "comment": "",
         "measureValue": null,
