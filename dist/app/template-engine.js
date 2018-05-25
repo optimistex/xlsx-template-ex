@@ -1,8 +1,7 @@
 const fs = require('fs');
 const moment = require('moment');
-const CellRange = require('./cell-range');
-const TemplateExpression = require('./template-expression');
-
+const CellRange = require('./cell-range').CellRange;
+const TemplateExpression = require('./template-expression').TemplateExpression;
 /**
  * @property {WorkSheetHelper} wsh
  * @property {object} data
@@ -19,12 +18,10 @@ class TemplateEngine {
         this.regExpBlocks = /\[\[.+?\]\]/g;
         this.regExpValues = /{{.+?}}/g;
     }
-
     execute() {
         this.processBlocks(this.wsh.getSheetDimension(), this.data);
         this.processValues(this.wsh.getSheetDimension(), this.data);
     }
-
     /**
      * @param {CellRange} cellRange
      * @param {object} data
@@ -43,21 +40,18 @@ class TemplateEngine {
                 if (!Array.isArray(matches) || !matches.length) {
                     return null;
                 }
-
                 matches.forEach(rawExpression => {
                     const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
                     cVal = cVal.replace(tplExp.rawExpression, '');
                     cell.value = cVal;
                     cellRange = this.processBlockPipes(cellRange, cell, tplExp.pipes, data[tplExp.valueName]);
                 });
-
                 restart = true;
                 return false;
             });
         } while (restart);
         return cellRange;
     }
-
     /**
      * @param {CellRange} cellRange
      * @param {object} data
@@ -72,7 +66,6 @@ class TemplateEngine {
             if (!Array.isArray(matches) || !matches.length) {
                 return;
             }
-
             matches.forEach(rawExpression => {
                 const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
                 let resultValue = data[tplExp.valueName] || '';
@@ -82,7 +75,6 @@ class TemplateEngine {
             cell.value = cVal;
         });
     }
-
     /**
      * @param {Cell} cell
      * @param {Array<{pipeName: string, pipeParameters: string[]}>} pipes
@@ -110,7 +102,6 @@ class TemplateEngine {
         });
         return value || '';
     }
-
     /**
      * @param {CellRange} cellRange
      * @param {Cell} cell
@@ -142,7 +133,6 @@ class TemplateEngine {
         });
         return newRange;
     }
-
     /**
      * @param {number|string} date
      * @return {string}
@@ -150,7 +140,6 @@ class TemplateEngine {
     valuePipeDate(date) {
         return date ? moment(new Date(date)).format('DD.MM.YYYY') : '';
     }
-
     /**
      * @param {Cell} cell
      * @param {string} fileName
@@ -163,7 +152,6 @@ class TemplateEngine {
         }
         return `File "${fileName}" not found`;
     }
-
     /**
      * Find object in array by value of a property
      * @param {Array} arrayData
@@ -177,7 +165,6 @@ class TemplateEngine {
         }
         return null;
     }
-
     /**
      * Find object in array by value of a property
      * @param {Array} data
@@ -186,7 +173,6 @@ class TemplateEngine {
     valuePipeGet(data, propertyName) {
         return data && propertyName && data[propertyName] || null;
     }
-
     /**
      * @param dataArray
      * @param propertyName
@@ -198,12 +184,10 @@ class TemplateEngine {
                 return dataArray.filter(item => typeof item === "object" && item[propertyName] === propertyValue);
             }
             return dataArray.filter(item => typeof item === "object" &&
-                item.hasOwnProperty(propertyName) && item[propertyName]
-            );
+                item.hasOwnProperty(propertyName) && item[propertyName]);
         }
         return dataArray;
     }
-
     /**
      * @param {Cell} cell
      * @param {object[]} dataArray
@@ -212,9 +196,7 @@ class TemplateEngine {
      */
     blockPipeRepeatRows(cell, dataArray, countRows) {
         if (!Array.isArray(dataArray) || !dataArray.length) {
-            console.warn('TemplateEngine.blockPipeRepeatRows', cell.address,
-                'The data must be not empty array, but got:', dataArray
-            );
+            console.warn('TemplateEngine.blockPipeRepeatRows', cell.address, 'The data must be not empty array, but got:', dataArray);
             return 0;
         }
         countRows = +countRows > 0 ? +countRows : 1;
@@ -223,10 +205,8 @@ class TemplateEngine {
         if (dataArray.length > 1) {
             this.wsh.cloneRows(startRow, endRow, dataArray.length - 1);
         }
-
         const wsDimension = this.wsh.getSheetDimension();
         let sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
-
         dataArray.forEach(data => {
             sectionRange = this.processBlocks(sectionRange, data);
             this.processValues(sectionRange, data);
@@ -234,7 +214,6 @@ class TemplateEngine {
         });
         return (dataArray.length - 1) * countRows;
     }
-
     /**
      *
      * @param {Cell} cell
@@ -247,21 +226,17 @@ class TemplateEngine {
     blockPipeTile(cell, dataArray, blockRows, blockColumns, tileColumns) {
         // return;
         if (!Array.isArray(dataArray) || !dataArray.length) {
-            console.warn('TemplateEngine.blockPipeTile', cell.address,
-                'The data must be not empty array, but got:', dataArray
-            );
+            console.warn('TemplateEngine.blockPipeTile', cell.address, 'The data must be not empty array, but got:', dataArray);
             return 0;
         }
         blockRows = +blockRows > 0 ? +blockRows : 1;
         blockColumns = +blockColumns > 0 ? +blockColumns : 1;
         tileColumns = +tileColumns > 0 ? +tileColumns : 1;
-
         const blockRange = new CellRange(cell.row, cell.col, cell.row + blockRows - 1, cell.col + blockColumns - 1);
         const cloneRowsCount = Math.ceil(dataArray.length / tileColumns) - 1;
         if (dataArray.length > tileColumns) {
             this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount);
         }
-
         let tileColumn = 1, tileRange = CellRange.createFromRange(blockRange);
         dataArray.forEach((data, idx, array) => {
             // Prepare the next tile
@@ -270,26 +245,23 @@ class TemplateEngine {
                 nextTileRange.move(0, tileRange.countColumns);
                 this.wsh.copyCellRange(tileRange, nextTileRange);
             }
-
             // Process templates
             tileRange = this.processBlocks(tileRange, data);
             this.processValues(tileRange, data);
-
             // Move tiles
             if (idx !== array.length - 1) {
                 tileColumn++;
                 if (tileColumn <= tileColumns) {
                     tileRange.move(0, tileRange.countColumns);
-                } else {
+                }
+                else {
                     tileColumn = 1;
                     blockRange.move(tileRange.countRows, 0);
                     tileRange = CellRange.createFromRange(blockRange);
                 }
             }
         });
-
         return cloneRowsCount * blockRange.countRows;
     }
 }
-
-module.exports = TemplateEngine;
+module.exports.TemplateEngine = TemplateEngine;

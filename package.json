@@ -15,13 +15,21 @@
   },
   "homepage": "https://github.com/optimistex/xlsx-template-ex#readme",
   "scripts": {
-    "start": "node example.js",
+    "start": "ts-node -- ./src/example.js dev",
+    "start-prod": "npm run build && node ./dist/example.js",
+    "build": "rm -r -f dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "exceljs": "^1.4.6",
     "lodash": "^4.17.10",
     "moment": "^2.22.1"
+  },
+  "devDependencies": {
+    "@types/node": "^10.1.2",
+    "nodemon": "^1.17.5",
+    "ts-node": "^6.0.5",
+    "typescript": "^2.8.3"
   },
   "contributors": [
     {

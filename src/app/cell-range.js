@@ -73,4 +73,4 @@ class CellRange {
     }
 }
 
-module.exports = CellRange;
+module.exports.CellRange = CellRange;

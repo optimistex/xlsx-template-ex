@@ -18,9 +18,8 @@ class TemplateExpression {
         const pipes = expressionParts.slice(1);
         pipes.forEach(pipe => {
             const pipeParts = pipe.split(':');
-            this.pipes.push({pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1)});
+            this.pipes.push({ pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1) });
         });
     }
 }
-
-module.exports = TemplateExpression;
+module.exports.TemplateExpression = TemplateExpression;
