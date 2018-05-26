@@ -4,7 +4,7 @@
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "Konstantin Polyntsov <optimistex@gmail.com>",
   "repository": {
     "type": "git",

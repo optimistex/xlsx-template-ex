@@ -1,0 +1,8 @@
+/src
+/test-data
+/node_modules
+
+.gitignore
+out.xlsx
+package-lock.json
+tsconfig.json
