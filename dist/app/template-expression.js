@@ -1,25 +1,17 @@
-/**
- * @property {string} rawExpression
- * @property {string} expression
- * @property {string} valueName
- * @property {Array<{pipeName: string, pipeParameters: string[]}>} pipes
- */
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class TemplateExpression {
-    /**
-     * @param {string} rawExpression
-     * @param {string} expression
-     */
     constructor(rawExpression, expression) {
         this.rawExpression = rawExpression;
-        this.expression = expression;
-        const expressionParts = this.expression.split('|');
-        this.valueName = expressionParts[0];
         this.pipes = [];
+        // this.rawExpression = rawExpression;
+        const expressionParts = expression.split('|');
+        this.valueName = expressionParts[0];
         const pipes = expressionParts.slice(1);
-        pipes.forEach(pipe => {
+        pipes.forEach((pipe) => {
             const pipeParts = pipe.split(':');
             this.pipes.push({ pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1) });
         });
     }
 }
-module.exports.TemplateExpression = TemplateExpression;
+exports.TemplateExpression = TemplateExpression;

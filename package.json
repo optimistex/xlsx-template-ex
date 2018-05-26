@@ -15,8 +15,8 @@
   },
   "homepage": "https://github.com/optimistex/xlsx-template-ex#readme",
   "scripts": {
-    "start": "ts-node -- ./src/example.ts dev",
-    "start-prod": "npm run build && node ./dist/example.js",
+    "start": "node ./dist/example.js",
+    "start-dev": "ts-node -- ./src/example.ts dev",
     "build": "rm -r -f dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

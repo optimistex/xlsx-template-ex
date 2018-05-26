@@ -21,17 +21,17 @@ export class TemplateEngine {
     let restart;
     do {
       restart = false;
-      this.wsh.eachCell(cellRange, (cell) => {
+      this.wsh.eachCell(cellRange, (cell: Cell) => {
         let cVal = cell.value;
         if (typeof cVal !== "string") {
           return null;
         }
-        const matches = cVal.match(this.regExpBlocks);
+        const matches = (cVal as string).match(this.regExpBlocks);
         if (!Array.isArray(matches) || !matches.length) {
           return null;
         }
 
-        matches.forEach(rawExpression => {
+        matches.forEach((rawExpression: string) => {
           const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
           cVal = (cVal as string).replace(tplExp.rawExpression, '');
           cell.value = cVal;
@@ -46,7 +46,7 @@ export class TemplateEngine {
   }
 
   private processValues(cellRange: CellRange, data: any): void {
-    this.wsh.eachCell(cellRange, (cell) => {
+    this.wsh.eachCell(cellRange, (cell: Cell) => {
       let cVal = cell.value;
       if (typeof cVal !== "string") {
         return;
@@ -56,7 +56,7 @@ export class TemplateEngine {
         return;
       }
 
-      matches.forEach(rawExpression => {
+      matches.forEach((rawExpression: string) => {
         const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
         let resultValue: any = data[tplExp.valueName] || '';
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
@@ -67,7 +67,7 @@ export class TemplateEngine {
   }
 
   private processValuePipes(cell: Cell, pipes: TemplatePipe[], value: any): string {
-    pipes.forEach(pipe => {
+    pipes.forEach((pipe: TemplatePipe) => {
       switch (pipe.pipeName) {
         case 'date':
           // value = this.valuePipeDate(value, ...pipe.pipeParameters);
@@ -94,7 +94,7 @@ export class TemplateEngine {
     // console.log('bp', pipes, data);
     const newRange = CellRange.createFromRange(cellRange);
     let insertedRows;
-    pipes.forEach(pipe => {
+    pipes.forEach((pipe: TemplatePipe) => {
       switch (pipe.pipeName) {
         case 'repeat-rows':
           // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
@@ -200,7 +200,7 @@ export class TemplateEngine {
     }
 
     let tileColumn = 1, tileRange = CellRange.createFromRange(blockRange);
-    dataArray.forEach((data, idx, array) => {
+    dataArray.forEach((data, idx: number, array: any[]) => {
       // Prepare the next tile
       if ((idx !== array.length - 1) && (tileColumn + 1 <= tileColumns)) {
         const nextTileRange = CellRange.createFromRange(tileRange);

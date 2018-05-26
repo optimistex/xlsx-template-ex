@@ -1,16 +1,7 @@
 import {Cell} from "exceljs";
 
 export class CellRange {
-  public top: number;
-  public left: number;
-  public bottom: number;
-  public right: number;
-
-  constructor(top: number, left: number, bottom: number, right: number) {
-    this.top = top;
-    this.left = left;
-    this.bottom = bottom;
-    this.right = right;
+  constructor(public top: number, public left: number, public bottom: number, public right: number) {
   }
 
   public static createFromCells(cellTL: Cell, cellBR: Cell): CellRange {
@@ -38,10 +29,10 @@ export class CellRange {
     this.right += dCol;
   }
 
-  public grow(range: CellRange): void {
-    this.top = Math.min(this.top, range.top);
-    this.left = Math.min(this.left, range.left);
-    this.bottom = Math.max(this.bottom, range.bottom);
-    this.right = Math.max(this.right, range.right);
-  }
+  // public grow(range: CellRange): void {
+  //   this.top = Math.min(this.top, range.top);
+  //   this.left = Math.min(this.left, range.left);
+  //   this.bottom = Math.max(this.bottom, range.bottom);
+  //   this.right = Math.max(this.right, range.right);
+  // }
 }

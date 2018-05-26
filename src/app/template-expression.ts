@@ -4,19 +4,15 @@ export interface TemplatePipe {
 }
 
 export class TemplateExpression {
-  public rawExpression: string;
-  public expression: string;
   public valueName: string;
-  public pipes: TemplatePipe[];
+  public pipes: TemplatePipe[] = [];
 
-  constructor(rawExpression: string, expression: string) {
-    this.rawExpression = rawExpression;
-    this.expression = expression;
-    const expressionParts = this.expression.split('|');
+  constructor(public rawExpression: string, expression: string) {
+    // this.rawExpression = rawExpression;
+    const expressionParts = expression.split('|');
     this.valueName = expressionParts[0];
-    this.pipes = [];
     const pipes = expressionParts.slice(1);
-    pipes.forEach(pipe => {
+    pipes.forEach((pipe: string) => {
       const pipeParts = pipe.split(':');
       this.pipes.push({pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1)});
     });

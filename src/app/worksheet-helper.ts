@@ -1,5 +1,5 @@
-import {Cell, Row, ValueType, Workbook, Worksheet} from "exceljs";
 import * as _ from 'lodash';
+import {Cell, Row, ValueType, Workbook, Worksheet} from "exceljs";
 import {CellRange} from "./cell-range";
 
 /**
@@ -9,10 +9,8 @@ import {CellRange} from "./cell-range";
 export type iterateCells = (cell: Cell) => void | false;
 
 export class WorkSheetHelper {
-  private worksheet: Worksheet;
 
-  constructor(worksheet: Worksheet) {
-    this.worksheet = worksheet;
+  constructor(private worksheet: Worksheet) {
   }
 
   public get workbook(): Workbook {
@@ -58,11 +56,62 @@ export class WorkSheetHelper {
     }
   }
 
+  public copyCellRange(rangeSrc: CellRange, rangeDest: CellRange): void {
+    if (rangeSrc.countRows !== rangeDest.countRows || rangeSrc.countColumns !== rangeDest.countColumns) {
+      console.warn('WorkSheetHelper.copyCellRange',
+        'The cell ranges must have an equal size', rangeSrc, rangeDest
+      );
+      return;
+    }
+    // todo: check intersection in the CellRange class
+    const dRow = rangeDest.bottom - rangeSrc.bottom;
+    const dCol = rangeDest.right - rangeSrc.right;
+    this.eachCellReverse(rangeSrc, (cellSrc: Cell) => {
+      const cellDest = this.worksheet.getCell(cellSrc.row + dRow, cellSrc.col + dCol);
+      this.copyCell(cellSrc, cellDest);
+    });
+  }
+
+  public getSheetDimension(): CellRange {
+    const dm = this.worksheet.dimensions['model'];
+    return new CellRange(dm.top, dm.left, dm.bottom, dm.right);
+  }
+
+  /** Iterate cells from the left of the top to the right of the bottom */
+  public eachCell(cellRange: CellRange, callBack: iterateCells) {
+    for (let r = cellRange.top; r <= cellRange.bottom; r++) {
+      const row = this.worksheet.findRow(r);
+      for (let c = cellRange.left; c <= cellRange.right; c++) {
+        const cell = row.findCell(c);
+        if (cell && cell.type !== ValueType.Merge) {
+          if (callBack(cell) === false) {
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  /** Iterate cells from the right of the bottom to the top of the left */
+  public eachCellReverse(cellRange: CellRange, callBack: iterateCells) {
+    for (let r = cellRange.bottom; r >= cellRange.top; r--) {
+      const row = this.worksheet.findRow(r);
+      for (let c = cellRange.right; c >= cellRange.left; c--) {
+        const cell = row.findCell(c);
+        if (cell && cell.type !== ValueType.Merge) {
+          if (callBack(cell) === false) {
+            return;
+          }
+        }
+      }
+    }
+  }
+
   private getMergeRange(cell: Cell): CellRange {
     if (cell.isMerged && Array.isArray(this.worksheet.model['merges'])) {
       const address = cell.type === ValueType.Merge ? cell.master.address : cell.address;
       const cellRangeStr = this.worksheet.model['merges']
-        .find(item => item.indexOf(address + ':') !== -1);
+        .find((item: string) => item.indexOf(address + ':') !== -1);
       if (cellRangeStr) {
         const [cellTlAdr, cellBrAdr] = cellRangeStr.split(':', 2);
         return CellRange.createFromCells(
@@ -125,22 +174,6 @@ export class WorkSheetHelper {
     cellDest.model = storeCellModel;
   }
 
-  public copyCellRange(rangeSrc: CellRange, rangeDest: CellRange): void {
-    if (rangeSrc.countRows !== rangeDest.countRows || rangeSrc.countColumns !== rangeDest.countColumns) {
-      console.warn('WorkSheetHelper.copyCellRange',
-        'The cell ranges must have an equal size', rangeSrc, rangeDest
-      );
-      return;
-    }
-    // todo: check intersection in the CellRange class
-    const dRow = rangeDest.bottom - rangeSrc.bottom;
-    const dCol = rangeDest.right - rangeSrc.right;
-    this.eachCellReverse(rangeSrc, (cellSrc) => {
-      const cellDest = this.worksheet.getCell(cellSrc.row + dRow, cellSrc.col + dCol);
-      this.copyCell(cellSrc, cellDest);
-    });
-  }
-
   private clearRow(row: Row): void {
     row.model = {
       cells: [], number: row.number, min: undefined, max: undefined, height: undefined,
@@ -148,45 +181,10 @@ export class WorkSheetHelper {
     };
   }
 
-  private clearCell(cell: Cell): void {
-    cell.model = {
-      address: cell.fullAddress.address, style: undefined, type: undefined, text: undefined, hyperlink: undefined,
-      value: undefined, master: undefined, formula: undefined, sharedFormula: undefined, result: undefined
-    };
-  }
-
-  getSheetDimension(): CellRange {
-    const dm = this.worksheet.dimensions['model'];
-    return new CellRange(dm.top, dm.left, dm.bottom, dm.right);
-  }
-
-  /** Iterate cells from the left of the top to the right of the bottom */
-  eachCell(cellRange: CellRange, callBack: iterateCells) {
-    for (let r = cellRange.top; r <= cellRange.bottom; r++) {
-      const row = this.worksheet.findRow(r);
-      for (let c = cellRange.left; c <= cellRange.right; c++) {
-        const cell = row.findCell(c);
-        if (cell && cell.type !== ValueType.Merge) {
-          if (callBack(cell) === false) {
-            return;
-          }
-        }
-      }
-    }
-  }
-
-  /** Iterate cells from the right of the bottom to the top of the left */
-  eachCellReverse(cellRange: CellRange, callBack: iterateCells) {
-    for (let r = cellRange.bottom; r >= cellRange.top; r--) {
-      const row = this.worksheet.findRow(r);
-      for (let c = cellRange.right; c >= cellRange.left; c--) {
-        const cell = row.findCell(c);
-        if (cell && cell.type !== ValueType.Merge) {
-          if (callBack(cell) === false) {
-            return;
-          }
-        }
-      }
-    }
-  }
+  // private clearCell(cell: Cell): void {
+  //   cell.model = {
+  //     address: cell.fullAddress.address, style: undefined, type: undefined, text: undefined, hyperlink: undefined,
+  //     value: undefined, master: undefined, formula: undefined, sharedFormula: undefined, result: undefined
+  //   };
+  // }
 }
