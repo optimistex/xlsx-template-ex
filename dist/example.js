@@ -1,5 +1,7 @@
-const fs = require('fs');
-const XlsxTemplate = require('./index');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const index_1 = require("./index");
 const testData = {
     "reportBuildDate": "2018-05-18T18:11:14.227Z",
     "taskCode": "ISE4",
@@ -210,7 +212,7 @@ const testData = {
         }],
     "steps": []
 };
-XlsxTemplate.xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex.xlsx')
+index_1.xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex.xlsx')
     .then((buffer) => {
     fs.writeFileSync('./out.xlsx', buffer);
 })
