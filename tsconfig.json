@@ -1,11 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "outDir": "./dist",
     "baseUrl": "app",
     "sourceMap": false,
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
     "module": "commonjs",
     "target": "es6",

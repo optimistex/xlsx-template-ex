@@ -1,10 +1,11 @@
 {
   "name": "xlsx-template-ex",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Konstantin Polyntsov <optimistex@gmail.com>",
   "repository": {
     "type": "git",
