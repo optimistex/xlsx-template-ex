@@ -115,4 +115,4 @@ Thanks for understanding!
 
 # License
 
-The MIT License (see the [LICENSE](https://github.com/optimistex/ngx-select-ex/blob/master/LICENSE) file for the full text)
+The MIT License (see the [LICENSE](https://github.com/optimistex/xlsx-template-ex/blob/master/LICENSE) file for the full text)
