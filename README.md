@@ -1,8 +1,7 @@
 # Excel template engine
-_______
 
 The Documentation available on languages:
-1. [English](README.md)
+1. [English](https://github.com/optimistex/xlsx-template-ex#readme)
 2. [Русский](README.ru.md)
 
 Supported files: **xlsx**

@@ -1,8 +1,7 @@
 # Excel шаблонизатор
-_______
 
 Документация доступна на языках:
-1. [English](README.md)
+1. [English](https://github.com/optimistex/xlsx-template-ex#readme)
 2. [Русский](README.ru.md)
 
 Совместимые файлы: **xlsx**
