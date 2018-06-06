@@ -1,4 +1,9 @@
 # Excel template engine
+_______
+
+The Documentation available on languages:
+1. [English](README.md)
+2. [Русский](README.ru.md)
 
 Supported files: **xlsx**
 
@@ -18,7 +23,7 @@ Where:
 
 ## Implemented expression variants
 
-* `{{propertyName}}` - out put a value as is
+* `{{propertyName}}` - output a value as is
 * `{{propertyName|date}}` - the value formatted as date 
 * `{{fileName|image}}` - find a picture file by file name. 
     If the picture found, then it embed into a table cell 
