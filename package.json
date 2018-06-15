@@ -1,6 +1,6 @@
 {
   "name": "xlsx-template-ex",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
@@ -22,7 +22,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "exceljs": "^1.4.6",
+    "exceljs": "^1.4.13",
     "lodash": "^4.17.10",
     "moment": "^2.22.1"
   },
