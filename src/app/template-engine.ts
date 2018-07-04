@@ -18,6 +18,14 @@ export class TemplateEngine {
   }
 
   private processBlocks(cellRange: CellRange, data: any): CellRange {
+    if (!cellRange.valid) {
+      console.log(
+        'xlsx-template-ex: Process blocks failed.',
+        'The cell range is invalid and will be skipped:',
+        this.wsh.sheetName, cellRange
+      );
+      return cellRange;
+    }
     let restart;
     do {
       restart = false;
@@ -46,6 +54,14 @@ export class TemplateEngine {
   }
 
   private processValues(cellRange: CellRange, data: any): void {
+    if (!cellRange.valid) {
+      console.log(
+        'xlsx-template-ex: Process values failed.',
+        'The cell range is invalid and will be skipped:',
+        this.wsh.sheetName, cellRange
+      );
+      return;
+    }
     this.wsh.eachCell(cellRange, (cell: Cell) => {
       let cVal = cell.value;
       if (typeof cVal !== "string") {
@@ -67,26 +83,32 @@ export class TemplateEngine {
   }
 
   private processValuePipes(cell: Cell, pipes: TemplatePipe[], value: any): string {
-    pipes.forEach((pipe: TemplatePipe) => {
-      switch (pipe.pipeName) {
-        case 'date':
-          // value = this.valuePipeDate(value, ...pipe.pipeParameters);
-          value = this.valuePipeDate(value);
-          break;
-        case 'image':
-          // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
-          value = this.valuePipeImage(cell, value);
-          break;
-        case 'find':
-          value = this.valuePipeFind(value, ...pipe.pipeParameters);
-          break;
-        case 'get':
-          value = this.valuePipeGet(value, ...pipe.pipeParameters);
-          break;
-        default:
-          console.log('The value pipe not found:', pipe.pipeName);
-      }
-    });
+    try {
+      pipes.forEach((pipe: TemplatePipe) => {
+        switch (pipe.pipeName) {
+          case 'date':
+            // value = this.valuePipeDate(value, ...pipe.pipeParameters);
+            value = this.valuePipeDate(value);
+            break;
+          case 'image':
+            // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
+            value = this.valuePipeImage(cell, value);
+            break;
+          case 'find':
+            value = this.valuePipeFind(value, ...pipe.pipeParameters);
+            break;
+          case 'get':
+            value = this.valuePipeGet(value, ...pipe.pipeParameters);
+            break;
+          default:
+            value = 'xlsx-template-ex: The value pipe not found:' + pipe.pipeName;
+            console.warn(value);
+        }
+      });
+    } catch (error) {
+      console.error('xlsx-template-ex: Error on process values of pipes', error);
+      return 'xlsx-template-ex: Error on process values of pipes. Look for more details in a console.';
+    }
     return value || '';
   }
 
@@ -94,24 +116,29 @@ export class TemplateEngine {
     // console.log('bp', pipes, data);
     const newRange = CellRange.createFromRange(cellRange);
     let insertedRows;
-    pipes.forEach((pipe: TemplatePipe) => {
-      switch (pipe.pipeName) {
-        case 'repeat-rows':
-          // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
-          insertedRows = this.blockPipeRepeatRows(cell, data, ...pipe.pipeParameters);
-          newRange.bottom += insertedRows;
-          break;
-        case 'tile':
-          insertedRows = this.blockPipeTile(cell, data, ...pipe.pipeParameters);
-          newRange.bottom += insertedRows;
-          break;
-        case 'filter':
-          data = this.blockPipeFilter(data, ...pipe.pipeParameters);
-          break;
-        default:
-          console.warn('The block pipe not found:', pipe.pipeName, pipe.pipeParameters);
-      }
-    });
+    try {
+      pipes.forEach((pipe: TemplatePipe) => {
+        switch (pipe.pipeName) {
+          case 'repeat-rows':
+            // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
+            insertedRows = this.blockPipeRepeatRows(cell, data, ...pipe.pipeParameters);
+            newRange.bottom += insertedRows;
+            break;
+          case 'tile':
+            insertedRows = this.blockPipeTile(cell, data, ...pipe.pipeParameters);
+            newRange.bottom += insertedRows;
+            break;
+          case 'filter':
+            data = this.blockPipeFilter(data, ...pipe.pipeParameters);
+            break;
+          default:
+            console.warn('xlsx-template-ex: The block pipe not found:', pipe.pipeName, pipe.pipeParameters);
+        }
+      });
+    } catch (error) {
+      console.error('xlsx-template-ex: Error on process a block of pipes', error);
+      cell.value = 'xlsx-template-ex: Error on process a block of pipes. Look for more details in a console.';
+    }
     return newRange;
   }
 

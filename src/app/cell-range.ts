@@ -13,6 +13,10 @@ export class CellRange {
     return new CellRange(range.top, range.left, range.bottom, range.right);
   }
 
+  public get valid() {
+    return this.top > 0 && this.top !== this.bottom && this.left >= 0 && this.left !== this.right;
+  }
+
   public get countRows(): number {
     return this.bottom - this.top + 1;
   }

@@ -17,6 +17,10 @@ export class WorkSheetHelper {
     return this.worksheet.workbook;
   }
 
+  get sheetName() {
+    return this.worksheet.name;
+  }
+
   public addImage(fileName: string, cell: Cell): void {
     const imgId = this.workbook.addImage({filename: fileName, extension: 'jpeg'});
 
@@ -135,8 +139,7 @@ export class WorkSheetHelper {
     rowModel.cells = [];
     rowDest.model = rowModel;
 
-    const lastCol = this.getSheetDimension().right;
-    for (let colNumber = lastCol; colNumber > 0; colNumber--) {
+    for (let colNumber = this.getSheetDimension().right; colNumber > 0; colNumber--) {
       const cell = rowSrc.getCell(colNumber);
       const newCell = rowDest.getCell(colNumber);
       this.copyCell(cell, newCell);
