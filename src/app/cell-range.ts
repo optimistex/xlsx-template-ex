@@ -14,7 +14,7 @@ export class CellRange {
   }
 
   public get valid() {
-    return this.top > 0 && this.top !== this.bottom && this.left >= 0 && this.left !== this.right;
+    return this.top > 0 && this.top <= this.bottom && this.left >= 0 && this.left <= this.right;
   }
 
   public get countRows(): number {
