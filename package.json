@@ -1,6 +1,6 @@
 {
   "name": "xlsx-template-ex",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
