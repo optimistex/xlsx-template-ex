@@ -85,11 +85,13 @@ export class WorkSheetHelper {
   public eachCell(cellRange: CellRange, callBack: iterateCells) {
     for (let r = cellRange.top; r <= cellRange.bottom; r++) {
       const row = this.worksheet.findRow(r);
-      for (let c = cellRange.left; c <= cellRange.right; c++) {
-        const cell = row.findCell(c);
-        if (cell && cell.type !== ValueType.Merge) {
-          if (callBack(cell) === false) {
-            return;
+      if (row) {
+        for (let c = cellRange.left; c <= cellRange.right; c++) {
+          const cell = row.findCell(c);
+          if (cell && cell.type !== ValueType.Merge) {
+            if (callBack(cell) === false) {
+              return;
+            }
           }
         }
       }
@@ -100,11 +102,13 @@ export class WorkSheetHelper {
   public eachCellReverse(cellRange: CellRange, callBack: iterateCells) {
     for (let r = cellRange.bottom; r >= cellRange.top; r--) {
       const row = this.worksheet.findRow(r);
-      for (let c = cellRange.right; c >= cellRange.left; c--) {
-        const cell = row.findCell(c);
-        if (cell && cell.type !== ValueType.Merge) {
-          if (callBack(cell) === false) {
-            return;
+      if (row) {
+        for (let c = cellRange.right; c >= cellRange.left; c--) {
+          const cell = row.findCell(c);
+          if (cell && cell.type !== ValueType.Merge) {
+            if (callBack(cell) === false) {
+              return;
+            }
           }
         }
       }
