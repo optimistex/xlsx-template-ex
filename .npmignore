@@ -2,7 +2,8 @@
 /test-data
 /node_modules
 
+out-*.xlsx
+
 .gitignore
-out.xlsx
 package-lock.json
 tsconfig.json

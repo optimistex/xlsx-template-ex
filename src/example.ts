@@ -212,9 +212,17 @@ const testData = {
   "steps": []
 };
 
-xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex.xlsx')
+xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex-1.xlsx')
   .then((buffer) => {
-    fs.writeFileSync('./out.xlsx', buffer);
+    fs.writeFileSync('./out-1.xlsx', buffer);
+  })
+  .catch((error) => {
+    console.log('xlsxHelper error:', error);
+  });
+
+xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex-2.xlsx')
+  .then((buffer) => {
+    fs.writeFileSync('./out-2.xlsx', buffer);
   })
   .catch((error) => {
     console.log('xlsxHelper error:', error);
