@@ -149,8 +149,6 @@ export class WorkSheetHelper {
         const newCell = rowDest.getCell(colNumber);
         this.copyCell(cell, newCell);
       }
-    } else {
-      rowDest.model = undefined
     }
   }
 
