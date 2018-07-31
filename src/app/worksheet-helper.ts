@@ -138,15 +138,19 @@ export class WorkSheetHelper {
 
   private copyRow(rowSrc: Row, rowDest: Row): void {
     /** @var {RowModel} */
-    const rowModel = _.cloneDeep(rowSrc.model);
-    rowModel.number = rowDest.number;
-    rowModel.cells = [];
-    rowDest.model = rowModel;
+    if (rowSrc.model) {
+      const rowModel = _.cloneDeep(rowSrc.model);
+      rowModel.number = rowDest.number;
+      rowModel.cells = [];
+      rowDest.model = rowModel;
 
-    for (let colNumber = this.getSheetDimension().right; colNumber > 0; colNumber--) {
-      const cell = rowSrc.getCell(colNumber);
-      const newCell = rowDest.getCell(colNumber);
-      this.copyCell(cell, newCell);
+      for (let colNumber = this.getSheetDimension().right; colNumber > 0; colNumber--) {
+        const cell = rowSrc.getCell(colNumber);
+        const newCell = rowDest.getCell(colNumber);
+        this.copyCell(cell, newCell);
+      }
+    } else {
+      rowDest.model = undefined
     }
   }
 
