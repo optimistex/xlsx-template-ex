@@ -212,6 +212,14 @@ const testData = {
   "steps": []
 };
 
+xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex-0.xlsx')
+  .then((buffer) => {
+    fs.writeFileSync('./out-0.xlsx', buffer);
+  })
+  .catch((error) => {
+    console.log('xlsxHelper error:', error);
+  });
+
 xlsxBuildByTemplate(testData, __dirname + '/../test-data/xlsx-template-ex-1.xlsx')
   .then((buffer) => {
     fs.writeFileSync('./out-1.xlsx', buffer);
