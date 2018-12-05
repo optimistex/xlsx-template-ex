@@ -23,7 +23,9 @@ Where:
 ## Implemented expression variants
 
 * `{{propertyName}}` - output a value as is
-* `{{propertyName|date}}` - the value formatted as date 
+* `{{propertyName|date}}` - the value formatted as date (DD.MM.YYYY)
+* `{{propertyName|time}}` - the value formatted as time (hh:mm:ss) 
+* `{{propertyName|datetime}}` - the value formatted as date and time (DD.MM.YYYY hh:mm:ss) 
 * `{{fileName|image}}` - find a picture file by file name. 
     If the picture found, then it embed into a table cell 
 * `{{propertyArrayName|find:propertyName:propertyValue}}` - find a value in the array `propertyArrayName` 
