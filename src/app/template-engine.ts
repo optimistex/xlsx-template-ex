@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as moment from 'moment';
-import {CellRange} from './cell-range';
-import {TemplateExpression, TemplatePipe} from './template-expression';
-import {WorkSheetHelper} from './worksheet-helper';
-import {Cell} from "exceljs";
+import { CellRange } from './cell-range';
+import { TemplateExpression, TemplatePipe } from './template-expression';
+import { WorkSheetHelper } from './worksheet-helper';
+import { Cell } from "exceljs";
 
 export class TemplateEngine {
   private readonly regExpBlocks: RegExp = /\[\[.+?]]/g;
@@ -100,6 +100,12 @@ export class TemplateEngine {
           case 'get':
             value = this.valuePipeGet(value, ...pipe.pipeParameters);
             break;
+          case 'time':
+            value = this.valuePipeTime(value);
+            break;
+          case 'datetime':
+            value = this.valuePipeDateTime(value);
+            break;
           default:
             value = 'xlsx-template-ex: The value pipe not found:' + pipe.pipeName;
             console.warn(value);
@@ -144,6 +150,15 @@ export class TemplateEngine {
 
   private valuePipeDate(date?: number | string): string {
     return date ? moment(new Date(date)).format('DD.MM.YYYY') : '';
+  }
+
+
+  private valuePipeTime(date?: number | string): string {
+    return date ? moment(new Date(date)).format('hh:mm:ss') : '';
+  }
+
+  private valuePipeDateTime(date?: number | string): string {
+    return date ? moment(new Date(date)).format('DD.MM.YYYY hh:mm:ss') : '';
   }
 
   private valuePipeImage(cell: Cell, fileName: string): string {
@@ -206,7 +221,7 @@ export class TemplateEngine {
 
   /** @return {number} count of inserted rows */
   private blockPipeTile(cell: Cell, dataArray: any[], blockRows?: number | string, blockColumns?: number | string,
-                        tileColumns?: number | string): number {
+    tileColumns?: number | string): number {
     // return;
     if (!Array.isArray(dataArray) || !dataArray.length) {
       console.warn('TemplateEngine.blockPipeTile', cell.address,
