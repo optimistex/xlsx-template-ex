@@ -1,6 +1,6 @@
 {
   "name": "xlsx-template-ex",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "The template engine for generate xlsx documents",
   "private": false,
   "license": "MIT",
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^10.12.0",
-    "nodemon": "^1.18.5",
+    "nodemon": "^1.18.7",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.3"
   },
