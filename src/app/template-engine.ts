@@ -75,6 +75,10 @@ export class TemplateEngine {
       matches.forEach((rawExpression: string) => {
         const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
         let resultValue: any = data[tplExp.valueName] || '';
+        if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
+          resultValue = this.data[tplExp.valueName];
+        }
+        
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
         cVal = (cVal as string).replace(tplExp.rawExpression, resultValue);
       });
