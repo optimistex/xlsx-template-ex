@@ -176,7 +176,7 @@ export class TemplateEngine {
   /** Find object in array by value of a property */
   private valuePipeFind(arrayData: any[], propertyName?: string, propertyValue?: string): any | null {
     if (Array.isArray(arrayData) && propertyName && propertyName) {
-      return arrayData.find(item => item && item[propertyName].length > 0 && item[propertyName] == propertyValue);
+      return arrayData.find(item => item && item[propertyName] && item[propertyName].length > 0 && item[propertyName] == propertyValue);
     }
     return null;
   }
@@ -189,13 +189,14 @@ export class TemplateEngine {
     if (Array.isArray(dataArray) && propertyName) {
       if (propertyValue) {
         return dataArray.filter(item => typeof item === "object" &&
+          item[propertyName] &&
           item[propertyName].length > 0 &&
           item[propertyName] === propertyValue);
       }
       return dataArray.filter(item => typeof item === "object" &&
-        item[propertyName].length > 0 &&
         item.hasOwnProperty(propertyName) &&
-        item[propertyName]
+        item[propertyName] &&
+        item[propertyName].length > 0
       );
     }
     return dataArray;
