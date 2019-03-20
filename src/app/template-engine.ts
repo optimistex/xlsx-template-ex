@@ -78,7 +78,7 @@ export class TemplateEngine {
         if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
           resultValue = this.data[tplExp.valueName];
         }
-        
+
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
         cVal = (cVal as string).replace(tplExp.rawExpression, resultValue);
       });
@@ -176,7 +176,7 @@ export class TemplateEngine {
   /** Find object in array by value of a property */
   private valuePipeFind(arrayData: any[], propertyName?: string, propertyValue?: string): any | null {
     if (Array.isArray(arrayData) && propertyName && propertyName) {
-      return arrayData.find(item => item && item[propertyName] == propertyValue);
+      return arrayData.find(item => item && item[propertyName] && item[propertyName].length > 0 && item[propertyName] == propertyValue);
     }
     return null;
   }
@@ -188,10 +188,15 @@ export class TemplateEngine {
   private blockPipeFilter(dataArray: any[], propertyName?: string, propertyValue?: string): any[] {
     if (Array.isArray(dataArray) && propertyName) {
       if (propertyValue) {
-        return dataArray.filter(item => typeof item === "object" && item[propertyName] === propertyValue);
+        return dataArray.filter(item => typeof item === "object" &&
+          item[propertyName] &&
+          item[propertyName].length > 0 &&
+          item[propertyName] === propertyValue);
       }
       return dataArray.filter(item => typeof item === "object" &&
-        item.hasOwnProperty(propertyName) && item[propertyName]
+        item.hasOwnProperty(propertyName) &&
+        item[propertyName] &&
+        item[propertyName].length > 0
       );
     }
     return dataArray;
