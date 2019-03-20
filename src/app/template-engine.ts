@@ -80,9 +80,8 @@ export class TemplateEngine {
         }
 
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
-        if (typeof cVal === 'string') {
-          cVal = (cVal as string).replace(tplExp.rawExpression, resultValue);
-        }
+        cVal = resultValue;
+
       });
       cell.value = cVal;
     });
@@ -111,6 +110,9 @@ export class TemplateEngine {
             break;
           case 'datetime':
             value = this.valuePipeDateTime(value);
+            break;
+          case 'number':
+            value = this.valuePipeNumber(value);
             break;
           default:
             value = 'xlsx-template-ex: The value pipe not found:' + pipe.pipeName;
@@ -152,6 +154,15 @@ export class TemplateEngine {
       cell.value = 'xlsx-template-ex: Error on process a block of pipes. Look for more details in a console.';
     }
     return newRange;
+  }
+
+  private valuePipeNumber(value?: any): any {
+    if (Number(value) && value % 1 !== 0) {
+      return parseFloat(value);
+    } else if (Number(value) && value % 1 === 0) {
+      return parseInt(value);
+    }
+    return value;
   }
 
   private valuePipeDate(date?: number | string): string {
