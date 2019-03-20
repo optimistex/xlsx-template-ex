@@ -80,7 +80,9 @@ export class TemplateEngine {
         }
 
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
-        cVal = (cVal as string).replace(tplExp.rawExpression, resultValue);
+        if (typeof cVal === 'string') {
+          cVal = (cVal as string).replace(tplExp.rawExpression, resultValue);
+        }
       });
       cell.value = cVal;
     });
