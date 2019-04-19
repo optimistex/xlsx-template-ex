@@ -244,7 +244,7 @@ export class TemplateEngine {
       sectionRange.move(+countRows, 0);
       sectionRange = this.processBlocks(sectionRange, data);
     });
-    return countRows;
+    return (dataArray.length - 1) * countRows;
   }
 
   /** @return {number} count of inserted rows */
