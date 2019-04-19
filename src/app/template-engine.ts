@@ -43,7 +43,13 @@ export class TemplateEngine {
           const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
           cVal = (cVal as string).replace(tplExp.rawExpression, '');
           cell.value = cVal;
-          cellRange = this.processBlockPipes(cellRange, cell, tplExp.pipes, data[tplExp.valueName]);
+
+          let resultData = data[tplExp.valueName];
+          if ((!data[tplExp.valueName] || !resultData) && this.data[tplExp.valueName]) {
+            resultData = this.data[tplExp.valueName];
+          }
+
+          cellRange = this.processBlockPipes(cellRange, cell, tplExp.pipes, resultData);
         });
 
         restart = true;
@@ -234,9 +240,9 @@ export class TemplateEngine {
     let sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
 
     dataArray.forEach(data => {
-      sectionRange = this.processBlocks(sectionRange, data);
       this.processValues(sectionRange, data);
       sectionRange.move(+countRows, 0);
+      sectionRange = this.processBlocks(sectionRange, data);
     });
     return (dataArray.length - 1) * countRows;
   }
