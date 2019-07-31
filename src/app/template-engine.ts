@@ -45,7 +45,7 @@ export class TemplateEngine {
           cell.value = cVal;
 
           let resultData = data[tplExp.valueName];
-          if ((!data[tplExp.valueName] || !resultData) && this.data[tplExp.valueName]) {
+          if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
             resultData = this.data[tplExp.valueName];
           }
 
@@ -73,6 +73,7 @@ export class TemplateEngine {
       if (typeof cVal !== "string") {
         return;
       }
+
       const matches = cVal.match(this.regExpValues);
       if (!Array.isArray(matches) || !matches.length) {
         return;
@@ -84,10 +85,8 @@ export class TemplateEngine {
         if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
           resultValue = this.data[tplExp.valueName];
         }
-
         resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
         cVal = resultValue;
-
       });
       cell.value = cVal;
     });
@@ -129,6 +128,7 @@ export class TemplateEngine {
       console.error('xlsx-template-ex: Error on process values of pipes', error);
       return 'xlsx-template-ex: Error on process values of pipes. Look for more details in a console.';
     }
+
     return value || '';
   }
 
@@ -189,7 +189,7 @@ export class TemplateEngine {
       this.wsh.addImage(fileName, cell);
       return fileName;
     }
-    return `File "${fileName}" not found`;
+    return ``;
   }
 
   /** Find object in array by value of a property */
@@ -240,9 +240,9 @@ export class TemplateEngine {
     let sectionRange = new CellRange(startRow, wsDimension.left, endRow, wsDimension.right);
 
     dataArray.forEach(data => {
+      sectionRange = this.processBlocks(sectionRange, data);
       this.processValues(sectionRange, data);
       sectionRange.move(+countRows, 0);
-      sectionRange = this.processBlocks(sectionRange, data);
     });
     return (dataArray.length - 1) * countRows;
   }
@@ -257,6 +257,7 @@ export class TemplateEngine {
       );
       return 0;
     }
+
     blockRows = +blockRows > 0 ? +blockRows : 1;
     blockColumns = +blockColumns > 0 ? +blockColumns : 1;
     tileColumns = +tileColumns > 0 ? +tileColumns : 1;
@@ -264,7 +265,7 @@ export class TemplateEngine {
     const blockRange = new CellRange(
       +cell.row, +cell.col, +cell.row + blockRows - 1, +cell.col + blockColumns - 1
     );
-    const cloneRowsCount = Math.ceil(dataArray.length / tileColumns) - 1;
+    const cloneRowsCount = Math.ceil((dataArray.length - 1) / tileColumns);
     if (dataArray.length > tileColumns) {
       this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount);
     }
@@ -281,7 +282,6 @@ export class TemplateEngine {
       // Process templates
       tileRange = this.processBlocks(tileRange, data);
       this.processValues(tileRange, data);
-
       // Move tiles
       if (idx !== array.length - 1) {
         tileColumn++;
