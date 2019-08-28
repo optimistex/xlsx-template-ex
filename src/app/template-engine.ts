@@ -177,11 +177,11 @@ export class TemplateEngine {
 
 
   private valuePipeTime(date?: number | string): string {
-    return date ? moment(new Date(date)).format('hh:mm:ss') : '';
+    return date ? moment(new Date(date)).format('HH:mm:ss') : '';
   }
 
   private valuePipeDateTime(date?: number | string): string {
-    return date ? moment(new Date(date)).format('DD.MM.YYYY hh:mm:ss') : '';
+    return date ? moment(new Date(date)).format('DD.MM.YYYY HH:mm:ss') : '';
   }
 
   private valuePipeImage(cell: Cell, fileName: string): string {
