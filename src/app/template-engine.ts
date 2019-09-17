@@ -265,7 +265,7 @@ export class TemplateEngine {
     const blockRange = new CellRange(
       +cell.row, +cell.col, +cell.row + blockRows - 1, +cell.col + blockColumns - 1
     );
-    const cloneRowsCount = Math.ceil((dataArray.length - 1) / tileColumns);
+    const cloneRowsCount = Math.ceil(dataArray.length / tileColumns) - 1;
     if (dataArray.length > tileColumns) {
       this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount);
     }
