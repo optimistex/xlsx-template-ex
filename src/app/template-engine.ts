@@ -81,7 +81,7 @@ export class TemplateEngine {
 
       matches.forEach((rawExpression: string) => {
         const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
-        let resultValue: any = data[tplExp.valueName] || '';
+        let resultValue: any = this.accountForZero(data[tplExp.valueName]);
         if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
           resultValue = this.data[tplExp.valueName];
         }
@@ -90,6 +90,17 @@ export class TemplateEngine {
       });
       cell.value = cVal;
     });
+  }
+
+  
+  private accountForZero(input: any) {
+    if (input !== null && input !== undefined) {
+      return input;
+    } else if (input === 0){
+        return 0;
+    } else {
+        return null;
+    }
   }
 
   private processValuePipes(cell: Cell, pipes: TemplatePipe[], value: any): string {
@@ -128,7 +139,9 @@ export class TemplateEngine {
       console.error('xlsx-template-ex: Error on process values of pipes', error);
       return 'xlsx-template-ex: Error on process values of pipes. Look for more details in a console.';
     }
-
+    if (value === 0){
+      return value;
+    } 
     return value || '';
   }
 
