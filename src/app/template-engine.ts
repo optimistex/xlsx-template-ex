@@ -1,16 +1,17 @@
-import * as fs from 'fs';
-import * as moment from 'moment';
-import { CellRange } from './cell-range';
-import { TemplateExpression, TemplatePipe } from './template-expression';
-import { WorkSheetHelper } from './worksheet-helper';
+import * as fs from "fs";
+import * as moment from "moment";
+import { CellRange } from "./cell-range";
+import { TemplateExpression, TemplatePipe } from "./template-expression";
+import { WorkSheetHelper } from "./worksheet-helper";
 import { Cell } from "exceljs";
+
+export type Pipes = Record<string, Function> | {};
 
 export class TemplateEngine {
   private readonly regExpBlocks: RegExp = /\[\[.+?]]/g;
   private readonly regExpValues: RegExp = /{{.+?}}/g;
 
-  constructor(private wsh: WorkSheetHelper, private data: any) {
-  }
+  constructor(private wsh: WorkSheetHelper, private data: any, private customPipes: Pipes) {}
 
   public execute(): void {
     this.processBlocks(this.wsh.getSheetDimension(), this.data);
@@ -19,11 +20,7 @@ export class TemplateEngine {
 
   private processBlocks(cellRange: CellRange, data: any): CellRange {
     if (!cellRange.valid) {
-      console.log(
-        'xlsx-template-ex: Process blocks failed.',
-        'The cell range is invalid and will be skipped:',
-        this.wsh.sheetName, cellRange
-      );
+      console.log("xlsx-template-ex: Process blocks failed.", "The cell range is invalid and will be skipped:", this.wsh.sheetName, cellRange);
       return cellRange;
     }
     let restart;
@@ -41,7 +38,7 @@ export class TemplateEngine {
 
         matches.forEach((rawExpression: string) => {
           const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
-          cVal = (cVal as string).replace(tplExp.rawExpression, '');
+          cVal = (cVal as string).replace(tplExp.rawExpression, "");
           cell.value = cVal;
 
           let resultData = data[tplExp.valueName];
@@ -61,11 +58,7 @@ export class TemplateEngine {
 
   private processValues(cellRange: CellRange, data: any): void {
     if (!cellRange.valid) {
-      console.log(
-        'xlsx-template-ex: Process values failed.',
-        'The cell range is invalid and will be skipped:',
-        this.wsh.sheetName, cellRange
-      );
+      console.log("xlsx-template-ex: Process values failed.", "The cell range is invalid and will be skipped:", this.wsh.sheetName, cellRange);
       return;
     }
     this.wsh.eachCell(cellRange, (cell: Cell) => {
@@ -92,85 +85,87 @@ export class TemplateEngine {
     });
   }
 
-  
   private accountForZero(input: any) {
     if (input !== null && input !== undefined) {
       return input;
-    } else if (input === 0){
-        return 0;
+    } else if (input === 0) {
+      return 0;
     } else {
-        return null;
+      return null;
     }
   }
 
   private processValuePipes(cell: Cell, pipes: TemplatePipe[], value: any): string {
     try {
       pipes.forEach((pipe: TemplatePipe) => {
+        if (this.customPipes[pipe.pipeName] && typeof this.customPipes[pipe.pipeName] === "function") {
+          value = this.customPipes[pipe.pipeName](value, ...pipe.pipeParameters);
+          return;
+        }
         switch (pipe.pipeName) {
-          case 'date':
+          case "date":
             // value = this.valuePipeDate(value, ...pipe.pipeParameters);
             value = this.valuePipeDate(value);
             break;
-          case 'image':
+          case "image":
             // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
             value = this.valuePipeImage(cell, value);
             break;
-          case 'find':
+          case "find":
             value = this.valuePipeFind(value, ...pipe.pipeParameters);
             break;
-          case 'get':
+          case "get":
             value = this.valuePipeGet(value, ...pipe.pipeParameters);
             break;
-          case 'time':
+          case "time":
             value = this.valuePipeTime(value);
             break;
-          case 'datetime':
+          case "datetime":
             value = this.valuePipeDateTime(value);
             break;
-          case 'number':
+          case "number":
             value = this.valuePipeNumber(value);
             break;
           default:
-            value = 'xlsx-template-ex: The value pipe not found:' + pipe.pipeName;
+            value = "xlsx-template-ex: The value pipe not found:" + pipe.pipeName;
             console.warn(value);
         }
       });
     } catch (error) {
-      console.error('xlsx-template-ex: Error on process values of pipes', error);
-      return 'xlsx-template-ex: Error on process values of pipes. Look for more details in a console.';
+      console.error("xlsx-template-ex: Error on process values of pipes", error);
+      return "xlsx-template-ex: Error on process values of pipes. Look for more details in a console.";
     }
-    if (value === 0){
+    if (value === 0) {
       return value;
-    } 
-    return value || '';
+    }
+    return value || "";
   }
 
   private processBlockPipes(cellRange: CellRange, cell: Cell, pipes: TemplatePipe[], data: any): CellRange {
-    // console.log('bp', pipes, data);
     const newRange = CellRange.createFromRange(cellRange);
     let insertedRows;
     try {
       pipes.forEach((pipe: TemplatePipe) => {
         switch (pipe.pipeName) {
-          case 'repeat-rows':
+          case "repeat-rows":
             // insertedRows = this.blockPipeRepeatRows.apply(this, [cell, data].concat(pipe.pipeParameters));
             insertedRows = this.blockPipeRepeatRows(cell, data, ...pipe.pipeParameters);
             newRange.bottom += insertedRows;
             break;
-          case 'tile':
+          case "tile":
             insertedRows = this.blockPipeTile(cell, data, ...pipe.pipeParameters);
             newRange.bottom += insertedRows;
             break;
-          case 'filter':
+          case "filter":
             data = this.blockPipeFilter(data, ...pipe.pipeParameters);
             break;
           default:
-            console.warn('xlsx-template-ex: The block pipe not found:', pipe.pipeName, pipe.pipeParameters);
+            console.warn("xlsx-template-ex: The block pipe not found:", pipe.pipeName, pipe.pipeParameters);
         }
       });
     } catch (error) {
-      console.error('xlsx-template-ex: Error on process a block of pipes', error);
-      cell.value = 'xlsx-template-ex: Error on process a block of pipes. Look for more details in a console.';
+      console.error("xlsx-template-ex: Error on process a block of pipes", error);
+      cell.value = "xlsx-template-ex: Error on process a block of pipes. Look for more details in a console.";
     }
     return newRange;
   }
@@ -185,16 +180,15 @@ export class TemplateEngine {
   }
 
   private valuePipeDate(date?: number | string): string {
-    return date ? moment(new Date(date)).format('DD.MM.YYYY') : '';
+    return date ? moment(new Date(date)).format("DD.MM.YYYY") : "";
   }
 
-
   private valuePipeTime(date?: number | string): string {
-    return date ? moment(new Date(date)).format('HH:mm:ss') : '';
+    return date ? moment(new Date(date)).format("HH:mm:ss") : "";
   }
 
   private valuePipeDateTime(date?: number | string): string {
-    return date ? moment(new Date(date)).format('DD.MM.YYYY HH:mm:ss') : '';
+    return date ? moment(new Date(date)).format("DD.MM.YYYY HH:mm:ss") : "";
   }
 
   private valuePipeImage(cell: Cell, fileName: string): string {
@@ -214,22 +208,17 @@ export class TemplateEngine {
   }
 
   private valuePipeGet(data: any[], propertyName?: string): any | null {
-    return data && propertyName && data[propertyName] || null;
+    return (data && propertyName && data[propertyName]) || null;
   }
 
   private blockPipeFilter(dataArray: any[], propertyName?: string, propertyValue?: string): any[] {
     if (Array.isArray(dataArray) && propertyName) {
       if (propertyValue) {
-        return dataArray.filter(item => typeof item === "object" &&
-          item[propertyName] &&
-          item[propertyName].length > 0 &&
-          item[propertyName] === propertyValue);
+        return dataArray.filter(
+          item => typeof item === "object" && item[propertyName] && item[propertyName].length > 0 && item[propertyName] === propertyValue
+        );
       }
-      return dataArray.filter(item => typeof item === "object" &&
-        item.hasOwnProperty(propertyName) &&
-        item[propertyName] &&
-        item[propertyName].length > 0
-      );
+      return dataArray.filter(item => typeof item === "object" && item.hasOwnProperty(propertyName) && item[propertyName] && item[propertyName].length > 0);
     }
     return dataArray;
   }
@@ -237,9 +226,7 @@ export class TemplateEngine {
   /** @return {number} count of inserted rows */
   blockPipeRepeatRows(cell: Cell, dataArray: any[], countRows?: number | string): number {
     if (!Array.isArray(dataArray) || !dataArray.length) {
-      console.warn('TemplateEngine.blockPipeRepeatRows', cell.address,
-        'The data must be not empty array, but got:', dataArray
-      );
+      console.warn("TemplateEngine.blockPipeRepeatRows", cell.address, "The data must be not empty array, but got:", dataArray);
       return 0;
     }
     countRows = +countRows > 0 ? +countRows : 1;
@@ -261,13 +248,10 @@ export class TemplateEngine {
   }
 
   /** @return {number} count of inserted rows */
-  private blockPipeTile(cell: Cell, dataArray: any[], blockRows?: number | string, blockColumns?: number | string,
-    tileColumns?: number | string): number {
+  private blockPipeTile(cell: Cell, dataArray: any[], blockRows?: number | string, blockColumns?: number | string, tileColumns?: number | string): number {
     // return;
     if (!Array.isArray(dataArray) || !dataArray.length) {
-      console.warn('TemplateEngine.blockPipeTile', cell.address,
-        'The data must be not empty array, but got:', dataArray
-      );
+      console.warn("TemplateEngine.blockPipeTile", cell.address, "The data must be not empty array, but got:", dataArray);
       return 0;
     }
 
@@ -275,18 +259,17 @@ export class TemplateEngine {
     blockColumns = +blockColumns > 0 ? +blockColumns : 1;
     tileColumns = +tileColumns > 0 ? +tileColumns : 1;
 
-    const blockRange = new CellRange(
-      +cell.row, +cell.col, +cell.row + blockRows - 1, +cell.col + blockColumns - 1
-    );
+    const blockRange = new CellRange(+cell.row, +cell.col, +cell.row + blockRows - 1, +cell.col + blockColumns - 1);
     const cloneRowsCount = Math.ceil(dataArray.length / tileColumns) - 1;
     if (dataArray.length > tileColumns) {
       this.wsh.cloneRows(blockRange.top, blockRange.bottom, cloneRowsCount);
     }
 
-    let tileColumn = 1, tileRange = CellRange.createFromRange(blockRange);
+    let tileColumn = 1,
+      tileRange = CellRange.createFromRange(blockRange);
     dataArray.forEach((data, idx: number, array: any[]) => {
       // Prepare the next tile
-      if ((idx !== array.length - 1) && (tileColumn + 1 <= tileColumns)) {
+      if (idx !== array.length - 1 && tileColumn + 1 <= tileColumns) {
         const nextTileRange = CellRange.createFromRange(tileRange);
         nextTileRange.move(0, tileRange.countColumns);
         this.wsh.copyCellRange(tileRange, nextTileRange);
