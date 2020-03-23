@@ -10,6 +10,7 @@ export type Pipes = Record<string, Function> | {};
 export class TemplateEngine {
   private readonly regExpBlocks: RegExp = /\[\[.+?]]/g;
   private readonly regExpValues: RegExp = /{{.+?}}/g;
+  private readonly regExpStringPipeParameter: RegExp = /^'.*'$/;
 
   constructor(private wsh: WorkSheetHelper, private data: any, private customPipes: Pipes) {}
 
@@ -41,10 +42,7 @@ export class TemplateEngine {
           cVal = (cVal as string).replace(tplExp.rawExpression, "");
           cell.value = cVal;
 
-          let resultData = data[tplExp.valueName];
-          if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
-            resultData = this.data[tplExp.valueName];
-          }
+          const resultData = this.processTplValues(tplExp, data);
 
           cellRange = this.processBlockPipes(cellRange, cell, tplExp.pipes, resultData);
         });
@@ -74,15 +72,38 @@ export class TemplateEngine {
 
       matches.forEach((rawExpression: string) => {
         const tplExp = new TemplateExpression(rawExpression, rawExpression.slice(2, -2));
-        let resultValue: any = this.accountForZero(data[tplExp.valueName]);
-        if (!data[tplExp.valueName] && this.data[tplExp.valueName]) {
-          resultValue = this.data[tplExp.valueName];
-        }
-        resultValue = this.processValuePipes(cell, tplExp.pipes, resultValue);
+        const resultData = this.processTplValues(tplExp, data);
+        const pipes = this.processTplPipes(tplExp, data);
+
+        let resultValue: any = this.accountForZero(resultData);
+
+        resultValue = this.processValuePipes(cell, pipes, resultValue);
         cVal = resultValue;
       });
       cell.value = cVal;
     });
+  }
+
+  private processTplValues(tplExp: TemplateExpression, data: any) {
+    let resultData = data[tplExp.valueName];
+    if (!resultData) {
+      resultData = tplExp.valueName.split(".").reduce((o, key) => (o && o[key] ? o[key] : null), this.data);
+    }
+    return resultData;
+  }
+
+  private processTplPipes(tplExp: TemplateExpression, data: any) {
+    let pipes: TemplatePipe[] = tplExp.pipes.map(p => {
+      return (
+        (p.pipeParameters = p.pipeParameters.map(param => {
+          if (this.regExpStringPipeParameter.test(param)) return param.slice(1, -1);
+          else if (data[param]) return data[param];
+          else return param.split(".").reduce((o, key) => (o && o[key] ? o[key] : null), this.data);
+        })),
+        p
+      );
+    });
+    return pipes;
   }
 
   private accountForZero(input: any) {
@@ -232,6 +253,7 @@ export class TemplateEngine {
     countRows = +countRows > 0 ? +countRows : 1;
     const startRow = +cell.row;
     const endRow = startRow + countRows - 1;
+
     if (dataArray.length > 1) {
       this.wsh.cloneRows(startRow, endRow, dataArray.length - 1);
     }
