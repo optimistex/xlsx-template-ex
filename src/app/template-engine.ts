@@ -87,7 +87,7 @@ export class TemplateEngine {
   private processTplValues(tplExp: TemplateExpression, data: any) {
     let resultData = data[tplExp.valueName];
     if (!resultData) {
-      resultData = tplExp.valueName.split(".").reduce((o, key) => (o && o[key] ? o[key] : null), this.data);
+      resultData = tplExp.valueName.split(".").reduce((o, key) => ((o && o[key]) || o[key] === 0 ? o[key] : null), this.data);
     }
     return resultData;
   }
@@ -97,8 +97,8 @@ export class TemplateEngine {
       return (
         (p.pipeParameters = p.pipeParameters.map(param => {
           if (this.regExpStringPipeParameter.test(param)) return param.slice(1, -1);
-          else if (data[param]) return data[param];
-          else return param.split(".").reduce((o, key) => (o && o[key] ? o[key] : null), this.data);
+          else if (data[param] || data[param] === 0) return data[param];
+          else return param.split(".").reduce((o, key) => ((o && o[key]) || o[key] === 0 ? o[key] : null), this.data);
         })),
         p
       );

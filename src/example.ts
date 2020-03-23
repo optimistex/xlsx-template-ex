@@ -5,7 +5,7 @@ const dummyData = {
   rootStore: {
     dummyArray: [
       {
-        d1: 1,
+        d1: 0,
         d2: 2
       },
       {
