@@ -9,12 +9,12 @@ export class TemplateExpression {
 
   constructor(public rawExpression: string, expression: string) {
     // this.rawExpression = rawExpression;
-    const expressionParts = expression.split('|');
+    const expressionParts = expression.split("|").map(e => e.trim());
     this.valueName = expressionParts[0];
     const pipes = expressionParts.slice(1);
     pipes.forEach((pipe: string) => {
-      const pipeParts = pipe.split(':');
-      this.pipes.push({pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1)});
+      const pipeParts = pipe.split(":").map(p => p.trim());
+      this.pipes.push({ pipeName: pipeParts[0], pipeParameters: pipeParts.slice(1) });
     });
   }
 }
