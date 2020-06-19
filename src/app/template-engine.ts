@@ -132,6 +132,10 @@ export class TemplateEngine {
             // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
             value = this.valuePipeImage(cell, value);
             break;
+          case "image2":
+            // value = this.valuePipeImage(cell, value, ...pipe.pipeParameters);
+            value = this.valuePipeImage2(cell, value);
+            break;
           case "find":
             value = this.valuePipeFind(value, ...pipe.pipeParameters);
             break;
@@ -216,6 +220,20 @@ export class TemplateEngine {
     if (fs.existsSync(fileName)) {
       this.wsh.addImage(fileName, cell);
       return fileName;
+    }
+    return ``;
+  }
+
+  private valuePipeImage2(cell: Cell, file: any): string {
+    let fileName;
+    if(typeof file == 'string'){
+      fileName = file;
+    }else{
+      fileName = file.path;
+    }
+    if (fs.existsSync(fileName)) {
+      this.wsh.addImage2(fileName, cell, file);
+      return ``;
     }
     return ``;
   }
