@@ -38,6 +38,32 @@ export class WorkSheetHelper {
     }
   }
 
+    public addImage2(fileName: string, cell: Cell, file: any): void {
+        const imgId = this.workbook.addImage({filename: fileName, extension: 'jpeg'});
+
+        const cellRange = this.getMergeRange(cell);
+        if (cellRange) {
+            this.worksheet.addImage(imgId, {
+                tl: {col: cellRange.left - 0.99999, row: cellRange.top - 0.99999},
+                br: {col: cellRange.right, row: cellRange.bottom}
+            });
+        } else {
+            let range = null;
+            if (typeof file == 'object' && file.width && file.height) {
+                range = {
+                    tl: {col: +cell.col - 0.99999, row: +cell.row - 0.99999},
+                    ext: {width: file.width, height: file.height}
+                }
+            } else {
+                range = {
+                    tl: {col: +cell.col - 0.99999, row: +cell.row - 0.99999},
+                    br : {col: +cell.col, row: +cell.row}
+                };
+            }
+            this.worksheet.addImage(imgId, range);
+        }
+    }
+
   public cloneRows(srcRowStart: number, srcRowEnd: number, countClones: number = 1): void {
     const countRows = srcRowEnd - srcRowStart + 1;
     const dxRow = countRows * countClones;
