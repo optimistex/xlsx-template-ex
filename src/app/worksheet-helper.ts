@@ -48,19 +48,31 @@ export class WorkSheetHelper {
                 br: {col: cellRange.right, row: cellRange.bottom}
             });
         } else {
-            let range = null;
-            if (typeof file == 'object' && file.width && file.height) {
-                range = {
-                    tl: {col: +cell.col - 0.99999, row: +cell.row - 0.99999},
-                    ext: {width: file.width, height: file.height}
-                }
-            } else {
-                range = {
-                    tl: {col: +cell.col - 0.99999, row: +cell.row - 0.99999},
-                    br : {col: +cell.col, row: +cell.row}
-                };
-            }
-            this.worksheet.addImage(imgId, range);
+          let range = null;
+          if (typeof file == 'object' && file.width && file.height) {
+            let height = Math.round(parseInt(cell['_row'].height) / 0.74);
+            let width = Math.round(parseInt(cell['_column'].width) / 0.125);
+
+            let left = (width - file.width) /2;
+            let top = (height - file.height)/2;
+
+            range = {
+              tl: {
+                nativeCol: parseInt(cell.col) - 1,
+                nativeColOff: left*10000,
+                nativeRow: parseInt(cell.row) - 1,
+                nativeRowOff: top*10000,
+              },
+              ext:{width:file.width, height:file.height}
+            };
+          }
+          else {
+            range = {
+              tl: { col: +cell.col - 0.99999, row: +cell.row - 0.99999 },
+              br: { col: +cell.col, row: +cell.row },
+            };
+          }
+          this.worksheet.addImage(imgId, range);
         }
     }
 
